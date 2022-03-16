@@ -1,3 +1,6 @@
+// svg 注册脚本
+import 'virtual:svg-icons-register';
+
 import { createApp } from 'vue';
 
 import TDesign from 'tdesign-vue-next';
