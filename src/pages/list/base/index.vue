@@ -6,6 +6,7 @@
           <t-button @click="handleSetupContract"> 新建合同 </t-button>
           <t-button variant="base" theme="default" :disabled="!selectedRowKeys.length"> 导出合同 </t-button>
           <p v-if="!!selectedRowKeys.length" class="selected-count">已选{{ selectedRowKeys.length }}项</p>
+          <svg-icon name="documentation" width="20"></svg-icon>
         </div>
         <t-input v-model="searchValue" class="search-input" placeholder="请输入你需要搜索的内容" clearable>
           <template #suffix-icon>
@@ -77,6 +78,8 @@ import { ResDataType } from '@/interface';
 import request from '@/utils/request';
 
 import { COLUMNS } from './constants';
+
+import SvgIcon from '@/components/svg-icon/index.vue';
 
 const data = ref([]);
 const pagination = ref({
