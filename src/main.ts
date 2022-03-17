@@ -2,7 +2,6 @@
 import 'virtual:svg-icons-register';
 
 import { createApp } from 'vue';
-
 import TDesign from 'tdesign-vue-next';
 import 'tdesign-vue-next/es/style/index.css';
 import VueClipboard from 'vue3-clipboard';
