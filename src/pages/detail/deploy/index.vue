@@ -81,7 +81,7 @@ import { changeChartsTheme, getSmoothLineDataSet, get2ColBarChartDataSet } from 
 import { BASE_INFO_DATA, TABLE_COLUMNS as columns } from './constants';
 
 import { prefix } from '@/config/global';
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 import { ResDataType } from '@/interface';
 import request from '@/utils/request';
 

@@ -72,7 +72,7 @@ import { LAST_7_DAYS } from '@/utils/date';
 import { useSettingStore } from '@/store';
 
 import Trend from '@/components/trend/index.vue';
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 
 echarts.use([GridComponent, LegendComponent, TooltipComponent, LineChart, ScatterChart, CanvasRenderer]);
 
