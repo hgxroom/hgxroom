@@ -11,8 +11,8 @@ import businessRouters from './modules/business';
 export const asyncRouterList: Array<RouteRecordRaw> = [
   ...baseRouters,
   ...componentsRouters,
-  ...businessRouters,
   ...othersRouters,
+  ...businessRouters,
 ];
 
 // 存放固定的路由
