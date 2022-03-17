@@ -116,7 +116,7 @@ import { BASE_INFO_DATA, TABLE_COLUMNS_DATA as columns, PRODUCT_LIST } from './c
 import request from '@/utils/request';
 import { ResDataType } from '@/interface';
 
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 import Product from './components/Product.vue';
 
 const data = ref([]);

@@ -214,7 +214,7 @@ import { LAST_7_DAYS } from '@/utils/date';
 
 // 导入样式
 import Trend from '@/components/trend/index.vue';
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 import {
   changeChartsTheme,
   constructInitDataset,

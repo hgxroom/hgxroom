@@ -73,7 +73,7 @@ import { MessagePlugin } from 'tdesign-vue-next';
 
 import { CONTRACT_STATUS, CONTRACT_TYPES, CONTRACT_PAYMENT_TYPES } from '@/constants';
 import Trend from '@/components/trend/index.vue';
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 import { ResDataType } from '@/interface';
 import request from '@/utils/request';
 

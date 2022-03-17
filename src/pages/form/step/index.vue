@@ -143,7 +143,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ValidateResultContext } from 'tdesign-vue-next';
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 
 import {
   FORM_RULES,
