@@ -27,7 +27,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import Card from '@/components/card/index.vue';
+import Card from '@/components/card/Block.vue';
 
 const BASE_INFO_DATA = [
   {
