@@ -1,5 +1,5 @@
 import Layout from '@/layouts';
-import DashboardIcon from '@/assets/assets-slide-dashboard.svg';
+import DashboardIcon from '@/assets/icons/assets-slide-dashboard.svg';
 
 export default [
   {

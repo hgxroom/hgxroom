@@ -1,7 +1,7 @@
 import Layout from '@/layouts';
-import ListIcon from '@/assets/assets-slide-list.svg';
-import FormIcon from '@/assets/assets-slide-form.svg';
-import DetailIcon from '@/assets/assets-slide-detail.svg';
+import ListIcon from '@/assets/icons/assets-slide-list.svg';
+import FormIcon from '@/assets/icons/assets-slide-form.svg';
+import DetailIcon from '@/assets/icons/assets-slide-detail.svg';
 
 export default [
   {

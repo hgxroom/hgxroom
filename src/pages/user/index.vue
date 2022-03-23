@@ -6,7 +6,7 @@
           Hi，Image
           <span class="regular"> 下午好，今天是你加入鹅厂的第 100 天～</span>
         </div>
-        <img src="@/assets/assets-tencent-logo.png" class="logo" />
+        <img src="@/assets/logo-text.png" class="logo" />
       </div>
 
       <card class="user-info-list" size="small" title="个人信息">
@@ -100,10 +100,10 @@ import { useSettingStore } from '@/store';
 import { LAST_7_DAYS } from '@/utils/date';
 import { USER_INFO_LIST, TEAM_MEMBERS, PRODUCT_LIST } from './constants';
 import { changeChartsTheme, getFolderLineDataSet } from '@/pages/dashboard/base/index';
-import ProductAIcon from '@/assets/assets-product-1.svg';
-import ProductBIcon from '@/assets/assets-product-2.svg';
-import ProductCIcon from '@/assets/assets-product-3.svg';
-import ProductDIcon from '@/assets/assets-product-4.svg';
+import ProductAIcon from '@/assets/icons/assets-product-1.svg';
+import ProductBIcon from '@/assets/icons/assets-product-2.svg';
+import ProductCIcon from '@/assets/icons/assets-product-3.svg';
+import ProductDIcon from '@/assets/icons/assets-product-4.svg';
 
 import Card from '@/components/card/Block.vue';
 

@@ -2,7 +2,7 @@
   <div class="login-wrapper">
     <div class="login__content">
       <div class="login__icon">
-        <img src="./logo.png" />
+        <img src="@/assets/logo-text.png" />
       </div>
       <login />
     </div>
@@ -14,9 +14,7 @@ import Login from './components/Login.vue';
 <style lang="less">
 .login-wrapper {
   height: 100vh;
-  background-size: cover;
-  background-position: 100%;
-  background: url("./login__background.png");
+  background: url('@/assets/bg/login__background.webp') no-repeat center/cover;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,7 +23,7 @@ import Login from './components/Login.vue';
 .login__icon {
   width: 218px;
   height: 64px;
-  margin: 0px auto;
+  margin: 0px auto 40px;
   img {
     width: 100%;
   }

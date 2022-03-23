@@ -30,7 +30,7 @@
       @close="handleClose"
       destroy-on-close
     >
-      <t-form ref="formRef" :data="formData" :rules="rules" label-align="top" >
+      <t-form ref="formRef" :data="formData" :rules="rules" label-align="top">
         <t-form-item label="工段" name="name">
           <t-input v-model="formData.name" placeholder="请输入内容" />
         </t-form-item>
@@ -48,10 +48,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import request from '@/utils/request';
 
+onMounted(() => {
+  request('/xiyou-digital-server/workshop/getAll').then((res) => {
+    console.log(res);
+  });
+});
 const formRef = ref(null);
-const data = ref([{index : 1}]);
+const data = ref([{ index: 1 }]);
 const INITIAL_DATA = {
   name: '',
   password: '',
@@ -113,8 +119,8 @@ const handleClick = (slotProps) => {
   } else {
     console.log(`新增`, formData);
     drawer.value = `新增工序`;
-    formData.value.name = " ";
-    formData.value.password = " ";
+    formData.value.name = ' ';
+    formData.value.password = ' ';
   }
   visible.value = true;
 };
@@ -129,10 +135,10 @@ const onSubmit = () => {
   // handleClose();
 };
 const handleClickDisable = (slotProps) => {
-  console.log(slotProps,"禁用")
+  console.log(slotProps, '禁用');
 };
 const handleClickDelete = (slotProps) => {
-  console.log(slotProps,"删除")
+  console.log(slotProps, '删除');
 };
 </script>
 <style lang="less" scoped>

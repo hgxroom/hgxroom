@@ -47,6 +47,12 @@ export default [
         component: () => import('@/pages/production/dyeing-order/index.vue'),
         meta: { title: '染色订单' },
       },
+      {
+        path: 'progress-board',
+        name: 'ProgressBoard',
+        component: () => import('@/pages/production/progress-board/index.vue'),
+        meta: { title: '进度看板' },
+      },
     ],
   },
 ];
