@@ -2,17 +2,10 @@
   <div class="login__form">
     <div class="login__form__title">生产进度追溯系统</div>
     <div class="login__form__content">
-      <t-form
-        ref="form"
-        :data="formData"
-        :rules="FORM_RULES"
-        :colon="true"
-        label-align="top"
-        @reset="onReset"
-        @submit="onSubmit"
-      >
-        <t-form-item label="用户名" name="account">
-          <t-input v-model="formData.account" clearable placeholder="请输入用户名">
+      <t-form ref="form" :data="formData" :colon="true" :label-width="0" @reset="onReset" @submit="onSubmit">
+        <div class="login__form__text">用户名：</div>
+        <t-form-item name="username">
+          <t-input v-model="formData.username" clearable placeholder="请输入用户名">
             <template #prefix-icon>
               <desktop-icon />
             </template>
@@ -32,44 +25,28 @@
     </div>
   </div>
 </template>
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { DesktopIcon, LockOnIcon } from 'tdesign-icons-vue-next';
-import { useUserStore } from '@/store';
-
-const userStore = useUserStore();
+import { login } from '@/api/login';
+import { setToken } from '@/utils/auth';
+import router from '@/router';
 
 const INITIAL_DATA = {
-  account: 'admin',
-  password: 'admin',
-};
-
-const FORM_RULES = {
-  account: [{ required: true, message: '账号必填', type: 'error' }],
-  password: [{ required: true, message: '密码必填', type: 'error' }],
+  username: '',
+  password: '',
 };
 const formData = ref({ ...INITIAL_DATA });
-
-const router = useRouter();
-
 const onReset = () => {
   MessagePlugin.success('重置成功');
 };
-
-const onSubmit = ({ validateResult, firstError }) => {
-  if (validateResult === true) {
-    userStore.login(formData.value).then(() => {
-      MessagePlugin.success('登录成功');
-      router.push({
-        path: '/dashboard/base',
-      });
-    });
-  } else {
-    console.log('Validate Errors: ', firstError, validateResult);
-    MessagePlugin.warning(firstError);
-  }
+const onSubmit = () => {
+  login(formData.value).then((res) => {
+    setToken(res.data.data, 'unicomToken');
+    MessagePlugin.success('登录成功');
+    router.push({ path: '/data' });
+  });
 };
 </script>
 <style lang="less">
@@ -87,7 +64,15 @@ const onSubmit = ({ validateResult, firstError }) => {
     text-align: center;
   }
   &__content {
-    margin: 50px 0 0;
+    margin: 0px 40px;
+    padding-bottom: 40px;
+  }
+  &__text {
+    font-size: 12px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 40px;
   }
 }
 .login-btn {
