@@ -56,7 +56,7 @@ instance.interceptors.request.use(
     addPendingRequest(config, pendingRequest); // 把当前请求添加到pendingRequest对象中
 
     // 为每个请求都携带token  [`Token`]为自定义key，可以更改
-    const token = getToken();
+    const token = getToken('unicomToken');
     if (token) {
       config.headers.user_token = `${token}`;
     }

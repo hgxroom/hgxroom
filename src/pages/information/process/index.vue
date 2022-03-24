@@ -12,7 +12,7 @@
           :columns="columns"
           @row-click="handleRowClick"
           :pagination="pagination"
-          @page-change="rehandlePageChange"
+          @change="rehandleChange"
         >
           <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
           <template #status="{ row }">
@@ -22,8 +22,9 @@
           <template #operation="{ row }">
             <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
             <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
-            <a class="t-button-link" @click="handleClickDelete(row)">删除</a>
-            <a class="t-button-link" @click="handleClickDisable(row)">禁用</a>
+            <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
+            <a v-else class="t-button-link" @click="handleClickDelete(row)">删除</a>
+            <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
           </template>
         </t-table>
       </div>
@@ -39,15 +40,9 @@
     >
       <t-form ref="formRef" :data="formData" :rules="rules" label-align="top">
         <t-form-item label="工段" name="parentId ">
-          <t-select
-            v-model="formData.parentId"
-            :style="{ width: '322px' }"
-            placeholder="请选择类型"
-            class="demo-select-base"
-            clearable
-          >
-            <t-option v-for="(item, index) in TYPE_OPTIONS" :key="index" :value="item.value" :label="item.label">
-              {{ item.label }}
+          <t-select v-model="formData.parentId" placeholder="请选择类型" class="demo-select-base" clearable>
+            <t-option v-for="item in TYPE_OPTIONS" :key="item.id" :value="item.id" :label="item.processName">
+              {{ item.processName }}
             </t-option>
           </t-select>
         </t-form-item>
@@ -80,12 +75,12 @@ const INITIAL_DATA = {
 };
 const drawer = ref(`新增工序`); // 抽屉标签
 const pagination = ref({
-  defaultPageSize: 20,
+  pageSize: 20,
   total: 0,
-  defaultCurrent: 1,
+  current: 1,
 });
 const rules = {
-  station: [{ required: true, message: '工段必填' }],
+  parentId: [{ required: true, message: '工段必填' }],
   processName: [{ required: true, message: '工序必填' }],
 };
 const formData = ref({ ...INITIAL_DATA });
@@ -131,24 +126,28 @@ const handleRowClick = ({ row }) => {
   chooseRow.value = row;
 };
 const getSection = () => {
-  selectProcessGet({ parentId: [0], status: 0 }).then((res) => {
-    console.log(res, 110);
+  // 下拉框数据 工段
+  selectProcessGet({ parentIds: [0], status: 0 }).then((res) => {
+    TYPE_OPTIONS.value = res.data.data;
   });
 };
 const getList = (obj: object) => {
   processListGet(obj).then((res) => {
     const list = res.data.data;
-    pagination.value.defaultPageSize = list.size;
+    pagination.value.pageSize = list.size;
     pagination.value.total = list.total;
-    pagination.value.defaultCurrent = list.current;
+    pagination.value.current = list.current;
     data.value = list.records;
-    console.log(data.value);
   });
 };
 const handleClick = (row) => {
-  if (row.station) {
+  if (row.parentId) {
     drawer.value = `编辑工序`;
-    formData.value.parentId = row.station;
+    TYPE_OPTIONS.value.forEach((item) => {
+      if (item.processName === row.station) {
+        formData.value.parentId = item.id;
+      }
+    });
     formData.value.processName = row.processName;
   } else {
     drawer.value = `新增工序`;
@@ -157,8 +156,9 @@ const handleClick = (row) => {
   }
   visible.value = true;
 };
-const rehandlePageChange = (curr, pageInfo) => {
-  console.log('分页变化', curr, pageInfo);
+const rehandleChange = (changeParams) => {
+  const { current, pageSize } = changeParams.pagination;
+  getList({ page: current, size: pageSize });
 };
 const handleClose = () => {
   visible.value = false;
@@ -179,20 +179,36 @@ const onSubmit = (type) => {
           MessagePlugin.success('保存成功');
           visible.value = false;
         }
-        getList({ page: pagination.value.defaultCurrent, size: pagination.value.defaultPageSize });
+        getList({ page: pagination.value.current, size: pagination.value.pageSize });
       });
     }
   });
 };
-const handleClickDisable = (slotProps) => {
-  console.log(slotProps, '禁用');
+const handleClickDisable = (row) => {
+  const status = row.status === 0 ? -1 : 0;
+  const message = status ? '禁用成功' : '启用成功';
+  processListAddOrUpdate({ id: row.id, status }).then((res) => {
+    data.value.forEach((item) => {
+      if (item === row) {
+        item.status = status;
+      }
+    });
+    MessagePlugin.success(message);
+  });
 };
-const handleClickDelete = (slotProps) => {
-  console.log(slotProps, '删除');
+const handleClickDelete = (row) => {
+  processListDel({ id: row.id, del: 1 }).then((res) => {
+    data.value.forEach((item, index) => {
+      if (item === row) {
+        data.value.splice(index, 1);
+      }
+    });
+    MessagePlugin.success('删除成功');
+  });
 };
 onMounted(() => {
   getSection();
-  getList({ page: 1, size: 10 });
+  getList({ page: pagination.value.current, size: pagination.value.pageSize });
 });
 </script>
 <style lang="less" scoped>

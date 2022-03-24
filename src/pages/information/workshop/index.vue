@@ -2,7 +2,7 @@
 <template>
   <div class="dyeing-order">
     <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title"><t-button theme="primary" @click="handleClick()">新增</t-button></div>
+      <div class="dyeing-order-top__title"><t-button theme="primary" @click="handleClick({})">新增</t-button></div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
@@ -10,17 +10,21 @@
           row-key="index"
           :data="data"
           :columns="columns"
-          :stripe="stripe"
-          :bordered="bordered"
-          :hover="hover"
           @row-click="handleRowClick"
           :pagination="pagination"
-          @page-change="rehandlePageChange"
+          @change="rehandleChange"
         >
-          <template #operation="slotProps">
-            <a class="t-button-link disabled" @click="handleClick(slotProps)">编辑</a>
-            <a class="t-button-link" @click="handleClickDelete(slotProps)">删除</a>
-            <a class="t-button-link" @click="handleClickDisable(slotProps)">禁用</a>
+          <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
+          <template #status="{ row }">
+            <span v-show="row.status === 0" class="span--normal">正常</span>
+            <span v-show="row.status === -1" class="span--disable">禁用</span>
+          </template>
+          <template #operation="{ row }">
+            <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
+            <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
+            <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
+            <a v-else class="t-button-link" @click="handleClickDelete(row)">删除</a>
+            <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
           </template>
         </t-table>
       </div>
@@ -34,41 +38,45 @@
       @close="handleClose"
       destroy-on-close
     >
-      <t-form ref="formRef" :data="formData" :rules="rules" label-align="top" >
-        <t-form-item label="编号" name="name">
-          <t-input v-model="formData.name" placeholder="请输入内容" />
+      <t-form ref="formRef" :data="formData" :rules="rules" label-align="top">
+        <t-form-item label="编号" name="workshopNumber">
+          <t-input v-model="formData.workshopNumber" placeholder="请输入内容" />
         </t-form-item>
-        <t-form-item label="车间" name="password">
-          <t-input v-model="formData.password" clearable />
+        <t-form-item label="车间" name="workshopName">
+          <t-input v-model="formData.workshopName" clearable />
         </t-form-item>
       </t-form>
       <template #footer>
-        <t-button v-show="drawer == `编辑车间`" theme="primary" type="submit" @click="onSubmit">保存</t-button>
-        <t-button v-show="drawer == `新增车间`" theme="primary" type="submit" @click="onSubmit">保存并新增</t-button>
-        <t-button v-show="drawer == `新增车间`" theme="primary" type="submit" @click="onSubmit">保存并复制</t-button>
+        <t-button v-show="drawer == `编辑车间`" theme="primary" type="submit" @click="onSubmit(0)">保存</t-button>
+        <t-button v-show="drawer == `新增车间`" theme="primary" type="submit" @click="onSubmit(1)">保存并新增</t-button>
+        <t-button v-show="drawer == `新增车间`" theme="primary" type="submit" @click="onSubmit(2)">保存并复制</t-button>
         <t-button variant="outline" @click="visible = false">取消</t-button>
       </template>
     </t-drawer>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { MessagePlugin, Row } from 'tdesign-vue-next';
+import { workshopListGet, workshopListDel, workshopListAddOrUpdate } from '@/api/base/workshop';
 
 const formRef = ref(null);
-const data = ref([{index : 1}]);
+const data = ref([]);
+const chooseRow = ref(null); // 编辑行
 const INITIAL_DATA = {
-  name: '',
-  password: '',
+  workshopNumber: '',
+  workshopName: '',
+  id: null,
 };
 const drawer = ref(`新增车间`);
 const pagination = ref({
-  defaultPageSize: 20,
-  total: 100,
-  defaultCurrent: 1,
+  pageSize: 20,
+  total: 0,
+  current: 1,
 });
 const rules = {
-  name: [{ required: true, message: '用户名必填' }],
-  password: [{ required: true, message: '用户名必填' }],
+  workshopNumber: [{ required: true, message: '用户名必填' }],
+  workshopName: [{ required: true, message: '用户名必填' }],
 };
 const formData = ref({ ...INITIAL_DATA });
 
@@ -78,27 +86,27 @@ const columns = [
     title: '序号',
   },
   {
-    colKey: 'index',
+    colKey: 'workshopNumber',
     title: '编号',
   },
   {
-    colKey: 'index',
+    colKey: 'workshopName',
     title: '车间',
   },
   {
-    colKey: 'index',
+    colKey: 'username',
     title: '创建人',
   },
   {
-    colKey: 'index',
+    colKey: 'createTime',
     title: '创建日期',
   },
   {
-    colKey: 'index',
+    colKey: 'updateTime',
     title: '更新日期',
   },
   {
-    colKey: 'index',
+    colKey: 'status',
     title: '状态',
   },
   {
@@ -108,36 +116,85 @@ const columns = [
   },
 ];
 const visible = ref(false);
-const handleClick = (slotProps) => {
-  if (slotProps) {
-    console.log(`编辑`, formData);
+const handleRowClick = ({ row }) => {
+  chooseRow.value = row;
+};
+const handleClick = (row) => {
+  if (row.workshopNumber) {
     drawer.value = `编辑车间`;
-    formData.value.name = `1`;
-    formData.value.password = `1`;
+    formData.value.workshopNumber = row.workshopNumber;
+    formData.value.workshopName = row.workshopName;
   } else {
-    console.log(`新增`, formData);
     drawer.value = `新增车间`;
-    formData.value.name = " ";
-    formData.value.password = " ";
+    formData.value.workshopNumber = '';
+    formData.value.workshopName = '';
   }
   visible.value = true;
 };
-const rehandlePageChange = (curr, pageInfo) => {
-  console.log('分页变化', curr, pageInfo);
-};
+
 const handleClose = () => {
   visible.value = false;
 };
-const onSubmit = () => {
-  console.log(formRef.value.validate());
-  // handleClose();
+const getList = (obj: object) => {
+  workshopListGet(obj).then((res) => {
+    const list = res.data.data;
+    pagination.value.pageSize = list.size;
+    pagination.value.total = list.total;
+    pagination.value.current = list.current;
+    data.value = list.records;
+    console.log(data.value);
+  });
 };
-const handleClickDisable = (slotProps) => {
-  console.log(slotProps,"禁用")
+const rehandleChange = (changeParams) => {
+  const { current, pageSize } = changeParams.pagination;
+  getList({ page: current, size: pageSize });
 };
-const handleClickDelete = (slotProps) => {
-  console.log(slotProps,"删除")
+const onSubmit = (type) => {
+  // type 保存状态 0：保存 1保存并新增 2保存并复制
+  formData.value.id = type ? null : chooseRow.value.id;
+  formRef.value.validate().then((res) => {
+    if (res === true) {
+      workshopListAddOrUpdate(formData.value).then((res) => {
+        if (type) {
+          MessagePlugin.success('新增成功');
+          if (type === 1) {
+            formData.value.workshopNumber = '';
+            formData.value.workshopName = '';
+          }
+        } else {
+          MessagePlugin.success('保存成功');
+          visible.value = false;
+        }
+        getList({ page: pagination.value.current, size: pagination.value.pageSize });
+      });
+    }
+  });
 };
+const handleClickDisable = (row) => {
+  const status = row.status === 0 ? -1 : 0;
+  const message = status ? '禁用成功' : '启用成功';
+  workshopListAddOrUpdate({ id: row.id, status }).then((res) => {
+    data.value.forEach((item) => {
+      if (item === row) {
+        item.status = status;
+      }
+    });
+    MessagePlugin.success(message);
+  });
+};
+const handleClickDelete = (row) => {
+  workshopListDel({ id: row.id, del: 1 }).then((res) => {
+    data.value.forEach((item, index) => {
+      if (item === row) {
+        data.value.splice(index, 1);
+      }
+    });
+    MessagePlugin.success('删除成功');
+  });
+};
+onMounted(() => {
+  getList({ page: pagination.value.current, size: pagination.value.pageSize });
+});
 </script>
 <style lang="less" scoped>
 .dyeing-order {
@@ -168,5 +225,11 @@ a.disabled {
   -moz-opacity: 0.5; /*Firefox私有，透明度50%*/
   opacity: 0.5; /*其他，透明度50%*/
   color: rgb(153, 153, 153);
+}
+.span--normal {
+  color: #00a870;
+}
+.span--disable {
+  color: rgba(0, 0, 0, 0.26);
 }
 </style>
