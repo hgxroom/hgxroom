@@ -202,13 +202,13 @@ const columns = [
 const handleChange = (value) => {
   // 根据工段动态加载工序
   selectProcessGet({ parentIds: value, status: 0 }).then((res) => {
-    TYPE_PROCESSNAME.value = res.data.data;
+    TYPE_PROCESSNAME.value = res.data;
   });
 };
 const getSection = (obj) => {
   // 下拉框数据 工段
   selectProcessGet(obj).then((res) => {
-    TYPE_STATION.value = res.data.data;
+    TYPE_STATION.value = res.data;
   });
 };
 // 选中行
@@ -217,7 +217,7 @@ const handleRowClick = ({ row }) => {
 };
 const getList = (obj: object) => {
   deviceInfoListGet(obj).then((res) => {
-    const list = res.data.data;
+    const list = res.data;
     pagination.value.pageSize = list.size;
     pagination.value.total = list.total;
     pagination.value.current = list.current;
@@ -288,7 +288,7 @@ const onSubmit = (type) => {
 const handleClickDisable = (row) => {
   const status = row.status === 0 ? -1 : 0;
   const message = status ? '禁用成功' : '启用成功';
-  deviceInfoListAddOrUpdate({ id: row.id, status }).then((res) => {
+  deviceInfoListAddOrUpdate({ id: row.id, status }).then(() => {
     data.value.forEach((item) => {
       if (item === row) {
         item.status = status;
@@ -298,7 +298,7 @@ const handleClickDisable = (row) => {
   });
 };
 const handleClickDelete = (row) => {
-  deviceInfoListDel({ id: row.id, del: 1 }).then((res) => {
+  deviceInfoListDel({ id: row.id, del: 1 }).then(() => {
     data.value.forEach((item, index) => {
       if (item === row) {
         data.value.splice(index, 1);
@@ -309,10 +309,10 @@ const handleClickDelete = (row) => {
 };
 onMounted(() => {
   selectDeviceTypeGet({ parentIds: [0], status: 0 }).then((res) => {
-    TYPE_DEVICE.value = res.data.data;
+    TYPE_DEVICE.value = res.data;
   });
   selectWorkshopGet({ parentIds: [0], status: 0 }).then((res) => {
-    TYPE_WORKSHOP.value = res.data.data;
+    TYPE_WORKSHOP.value = res.data;
   });
   getSection({ parentIds: [0], status: 0 });
   getList({ page: pagination.value.current, size: pagination.value.pageSize });

@@ -3,8 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { prefix } from '@/config/global';
 import pgk from '../../../package.json';
 import MenuContent from './MenuContent';
-import tLogo from '@/assets/assets-t-logo.svg?component';
-import tLogoFull from '@/assets/assets-logo-full.svg?component';
+
 import { useSettingStore } from '@/store';
 
 const MIN_POINT = 992 - 1;
@@ -49,10 +48,6 @@ const useComputed = (props) => {
 
 export default defineComponent({
   name: 'SideNav',
-  components: {
-    tLogoFull,
-    tLogo,
-  },
   props: {
     menu: {
       type: Array as PropType<string[]>,
@@ -146,9 +141,9 @@ export default defineComponent({
               this.showLogo && (
                 <span class={`${prefix}-side-nav-logo-wrapper`} onClick={this.goHome}>
                   {this.collapsed ? (
-                    <tLogo class={`${prefix}-side-nav-logo-t-logo`} />
+                    <img class={`${prefix}-side-nav-logo-wrapper`} src="/src/assets/logo.png" alt="" />
                   ) : (
-                    <t-logo-full class={`${prefix}-side-nav-logo-tdesign-logo`} />
+                    <img class={`${prefix}-side-nav-logo-tdesign-logo`} src="/src/assets/logo-text.png"></img>
                   )}
                 </span>
               ),

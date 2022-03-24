@@ -133,7 +133,7 @@ const getSection = () => {
 };
 const getList = (obj: object) => {
   processListGet(obj).then((res) => {
-    const list = res.data.data;
+    const list = res.data;
     pagination.value.pageSize = list.size;
     pagination.value.total = list.total;
     pagination.value.current = list.current;

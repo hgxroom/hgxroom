@@ -1,11 +1,11 @@
-const TokenKey = 'access_token';
+import { TOKEN_NAME } from '@/config/global';
 
 /**
  * 获取token
  * @param {string} rename
  * @returns {string} token
  */
-export function getToken(rename = TokenKey) {
+export function getToken(rename = TOKEN_NAME) {
   return localStorage.getItem(rename);
 }
 
@@ -14,7 +14,7 @@ export function getToken(rename = TokenKey) {
  * @param {string} token
  * @param {string} rename
  */
-export function setToken(token, rename = TokenKey) {
+export function setToken(token, rename = TOKEN_NAME) {
   localStorage.setItem(rename, token);
 }
 
@@ -22,7 +22,7 @@ export function setToken(token, rename = TokenKey) {
  * 删除token
  * @param {string} rename
  */
-export function removeToken(rename = TokenKey) {
+export function removeToken(rename = TOKEN_NAME) {
   localStorage.removeItem(rename);
 }
 

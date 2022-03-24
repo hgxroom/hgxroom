@@ -113,7 +113,7 @@ const columns = [
 const visible = ref(false);
 const getList = (obj: object) => {
   deviceTypeListGet(obj).then((res) => {
-    const list = res.data.data;
+    const list = res.data;
     pagination.value.pageSize = list.size;
     pagination.value.total = list.total;
     pagination.value.current = list.current;

@@ -1,7 +1,7 @@
 export default {
   development: {
     // 开发环境接口请求
-    host: 'http://192.168.1.81:7600',
+    host: 'http://192.168.1.123:7600',
     // 开发环境 cdn 路径
     cdn: '',
   },

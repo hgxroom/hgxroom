@@ -65,7 +65,7 @@ export default defineComponent({
             layout={settingStore.layout}
             isFixed={settingStore.isSidebarFixed}
             menu={sideMenu.value}
-            theme={settingStore.displayMode}
+            theme={'dark'} // 总是使用黑色菜单
             isCompact={settingStore.isSidebarCompact}
           />
         )

@@ -2,9 +2,8 @@
   <div class="login__form">
     <div class="login__form__title">生产进度追溯系统</div>
     <div class="login__form__content">
-      <t-form ref="form" :data="formData" :colon="true" :label-width="0" @reset="onReset" @submit="onSubmit">
-        <div class="login__form__text">用户名：</div>
-        <t-form-item name="username">
+      <t-form ref="form" :data="formData" :rules="FORM_RULES" :colon="true" label-align="top" @submit="onSubmit">
+        <t-form-item label="用户名" name="username">
           <t-input v-model="formData.username" clearable placeholder="请输入用户名">
             <template #prefix-icon>
               <desktop-icon />
@@ -27,26 +26,38 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { DesktopIcon, LockOnIcon } from 'tdesign-icons-vue-next';
-import { login } from '@/api/login';
-import { setToken } from '@/utils/auth';
-import router from '@/router';
+import { useUserStore } from '@/store';
+
+const userStore = useUserStore();
 
 const INITIAL_DATA = {
-  username: '',
-  password: '',
+  username: 'admin',
+  password: '123456',
 };
+
+const FORM_RULES = {
+  username: [],
+  password: [],
+};
+
 const formData = ref({ ...INITIAL_DATA });
-const onReset = () => {
-  MessagePlugin.success('重置成功');
-};
-const onSubmit = () => {
-  login(formData.value).then((res) => {
-    setToken(res.data.data, 'unicomToken');
+
+const router = useRouter();
+
+const onSubmit = async ({ validateResult }) => {
+  if (validateResult !== true) {
+    return;
+  }
+  try {
+    await userStore.login(formData.value);
     MessagePlugin.success('登录成功');
     router.push({ path: '/data' });
-  });
+  } catch (error) {
+    MessagePlugin.error(error.message);
+  }
 };
 </script>
 <style lang="less">
@@ -64,15 +75,7 @@ const onSubmit = () => {
     text-align: center;
   }
   &__content {
-    margin: 0px 40px;
-    padding-bottom: 40px;
-  }
-  &__text {
-    font-size: 12px;
-    font-family: PingFangSC-Regular, PingFang SC;
-    font-weight: 400;
-    color: rgba(0, 0, 0, 0.6);
-    line-height: 40px;
+    margin: 50px 0 0;
   }
 }
 .login-btn {

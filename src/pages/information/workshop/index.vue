@@ -137,7 +137,7 @@ const handleClose = () => {
 };
 const getList = (obj: object) => {
   workshopListGet(obj).then((res) => {
-    const list = res.data.data;
+    const list = res.data;
     pagination.value.pageSize = list.size;
     pagination.value.total = list.total;
     pagination.value.current = list.current;
@@ -154,7 +154,7 @@ const onSubmit = (type) => {
   formData.value.id = type ? null : chooseRow.value.id;
   formRef.value.validate().then((res) => {
     if (res === true) {
-      workshopListAddOrUpdate(formData.value).then((res) => {
+      workshopListAddOrUpdate(formData.value).then(() => {
         if (type) {
           MessagePlugin.success('新增成功');
           if (type === 1) {
@@ -173,7 +173,7 @@ const onSubmit = (type) => {
 const handleClickDisable = (row) => {
   const status = row.status === 0 ? -1 : 0;
   const message = status ? '禁用成功' : '启用成功';
-  workshopListAddOrUpdate({ id: row.id, status }).then((res) => {
+  workshopListAddOrUpdate({ id: row.id, status }).then(() => {
     data.value.forEach((item) => {
       if (item === row) {
         item.status = status;
@@ -183,7 +183,7 @@ const handleClickDisable = (row) => {
   });
 };
 const handleClickDelete = (row) => {
-  workshopListDel({ id: row.id, del: 1 }).then((res) => {
+  workshopListDel({ id: row.id, del: 1 }).then(() => {
     data.value.forEach((item, index) => {
       if (item === row) {
         data.value.splice(index, 1);

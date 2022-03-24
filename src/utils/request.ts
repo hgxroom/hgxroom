@@ -1,15 +1,14 @@
 import axios from 'axios';
 import { getToken } from '@/utils/auth';
 import proxy from '../config/proxy';
+import { showMessage } from '@/utils/notice';
 
 const env = import.meta.env.MODE || 'development';
 
 const host = env === 'mock' ? '/' : proxy[env].host; // 如果是mock模式 就不配置host 会走本地Mock拦截
 
 const CODE = {
-  LOGIN_TIMEOUT: 1000,
-  REQUEST_SUCCESS: 0,
-  REQUEST_FOBID: 1001,
+  REQUEST_SUCCESS: '00000',
 };
 
 /** 请求队列 */
@@ -56,7 +55,7 @@ instance.interceptors.request.use(
     addPendingRequest(config, pendingRequest); // 把当前请求添加到pendingRequest对象中
 
     // 为每个请求都携带token  [`Token`]为自定义key，可以更改
-    const token = getToken('unicomToken');
+    const token = getToken();
     if (token) {
       config.headers.user_token = `${token}`;
     }
@@ -96,23 +95,35 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    if (response.status === 200) {
-      const { data } = response;
-      if (data.code === CODE.REQUEST_SUCCESS) {
-        return data;
-      }
-    }
-    return response;
-  },
-  (err) => {
-    const { config } = err;
+    // 2xx 范围内的状态码都会触发该函数。
+    removePendingRequest(response.config, pendingRequest);
 
-    if (!config || !config.retry) return Promise.reject(err);
+    const { data } = response;
+    if (data.code === CODE.REQUEST_SUCCESS) {
+      return data;
+    }
+    showMessage(data.message, 'error');
+    return Promise.reject(response);
+  },
+  (error) => {
+    // 超出 2xx 范围的状态码都会触发该函数。
+    removePendingRequest(error.config || {}, pendingRequest);
+    if (axios.isCancel(error)) {
+      console.log(`已取消的重复请求：${error.message}`);
+    }
+    // 直接传递错误
+    // Error.response //响应体
+    // Error.message 	//错误信息
+    const { config } = error;
+
+    if (!config || !config.retry) {
+      return Promise.reject(error);
+    }
 
     config.retryCount = config.retryCount || 0;
 
     if (config.retryCount >= config.retry) {
-      return Promise.reject(err);
+      return Promise.reject(error);
     }
 
     config.retryCount += 1;
