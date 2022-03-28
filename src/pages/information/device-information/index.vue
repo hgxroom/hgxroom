@@ -27,7 +27,7 @@
           <template #tree="{ row }">
             <span v-for="item in row.tree" :key="item.id">
               {{ item.name }}
-              <a v-if="item.child" class="t-button-link">
+              <a v-if="item.child" class="t-button-link" @click="ondialog(item.child)">
                 {{ item.child.length }}
               </a>
             </span>
@@ -72,29 +72,22 @@
             </t-option>
           </t-select>
         </t-form-item>
-        <t-form-item label="工段" name="stationIds">
-          <t-select
-            v-model="formData.stationIds"
-            placeholder="请选择工段"
-            class="demo-select-base"
-            clearable
-            @change="handleChange"
+        <t-form-item label="工段&工序" name="stationprocessIds">
+          <t-cascader
             multiple
-          >
-            <t-option v-for="item in TYPE_STATION" :key="item.id" :value="item.id" :label="item.processName">
-              {{ item.processName }}
-            </t-option>
-          </t-select>
-        </t-form-item>
-        <t-form-item label="工序" name="processIds">
-          <t-select v-model="formData.processIds" placeholder="请选择工序" class="demo-select-base" clearable multiple>
-            <t-option v-for="item in TYPE_PROCESSNAME" :key="item.id" :value="item.id" :label="item.processName">
-              {{ item.processName }}
-            </t-option>
-          </t-select>
+            v-model="formData.stationprocessIds"
+            class="t-demo-cascader"
+            :options="TYPE_STATION_IDS"
+            clearable
+            :load="load"
+          />
         </t-form-item>
         <t-form-item label="工率" name="power">
-          <t-input v-model="formData.power" clearable />
+          <t-select v-model="formData.power" placeholder="请选择工率" class="demo-select-base" clearable>
+            <t-option v-for="item in [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]" :key="item" :value="item">
+              {{ item }}
+            </t-option>
+          </t-select>
         </t-form-item>
       </t-form>
       <template #footer>
@@ -104,6 +97,11 @@
         <t-button variant="outline" @click="visible = false">取消</t-button>
       </template>
     </t-drawer>
+    <t-dialog v-model:visible="visibleModal" header="工序详情" mode="modal" draggable :confirmBtn="DIALOG_BUTTON">
+      <template #body>
+        <div v-for="item in DIALOG_TABLE" :key="item.id" :value="item.id">工序：{{ item.name }}；</div>
+      </template>
+    </t-dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -118,8 +116,7 @@ const formRef = ref(null);
 const visible = ref(false);
 const data = ref([]);
 const chooseRow = ref(null); // 编辑行
-const TYPE_STATION = ref([]); // 所有工段
-const TYPE_PROCESSNAME = ref([]); // 所有工序
+const TYPE_STATION_IDS = ref([]); // 级联工段工序
 const TYPE_DEVICE = ref([]); // 设备类型
 const TYPE_WORKSHOP = ref([]); // 车间
 const INITIAL_DATA = {
@@ -129,22 +126,32 @@ const INITIAL_DATA = {
   workshopId: null, // 车间
   stationIds: [], // 工段
   processIds: [], // 工序
-  power: '', // 功率
+  stationprocessIds: [], // 工段&工序
+  power: null, // 功率
   id: null,
 };
 const drawer = ref(`新增设备`);
 const pagination = ref({
-  pageSize: 5,
+  pageSize: 20,
   total: 0,
-  current: 0,
+  current: 1,
+  pageSizeOptions: [
+    { label: '10条/页', value: 10 },
+    { label: '20条/页', value: 20 },
+    { label: '50条/页', value: 50 },
+    { label: '100条/页', value: 100 },
+  ],
 });
 const rules = {
-  deviceNumber: [{ required: true, message: '设备号必填' }],
+  deviceNumber: [
+    { required: true, message: '设备号必填' },
+    { pattern: /^[a-zA-Z0-9]{1,8}$/, message: '最多8个数字或字母' },
+  ],
+  deviceId: [{ pattern: /^[a-zA-Z0-9]{1,8}$/, message: '最多8个数字或字母' }],
   deviceType: [{ required: true, message: '设备类型必填' }],
   workshopId: [{ required: true, message: '车间必填' }],
-  stationIds: [{ required: true, message: '工段必填' }],
-  processIds: [{ required: true, message: '工序必填' }],
-  power: [{ required: true, message: '功率必填' }],
+  stationprocessIds: [{ required: true, message: '工段&工序必填' }],
+  power: [{ required: true, message: '功率必选' }],
 };
 const formData = ref({ ...INITIAL_DATA });
 
@@ -199,17 +206,45 @@ const columns = [
     width: 200,
   },
 ];
-const handleChange = (value) => {
-  // 根据工段动态加载工序
-  selectProcessGet({ parentIds: value, status: 0 }).then((res) => {
-    TYPE_PROCESSNAME.value = res.data;
-  });
+const DIALOG_TABLE = ref([]); // 弹出框数据
+const DIALOG_BUTTON = ref(null);
+const visibleModal = ref(false);
+const ondialog = (data) => {
+  DIALOG_TABLE.value = data;
+  visibleModal.value = true;
 };
 const getSection = (obj) => {
   // 下拉框数据 工段
   selectProcessGet(obj).then((res) => {
-    TYPE_STATION.value = res.data;
+    res.data.forEach((item) => {
+      item.value = String(item.id);
+      item.label = item.processName;
+      item.children = true;
+      if (item.id === 10002) item.children = [{ label: '测试', value: 1 }];
+    });
+    TYPE_STATION_IDS.value = res.data;
+    console.log(TYPE_STATION_IDS.value, 258);
   });
+};
+const load = (node) => {
+  return selectProcessGet({ parentIds: [node.value], status: 0 }).then((res) => {
+    res.data.forEach((item) => {
+      item.value = `${item.parentId}-${item.id}`;
+      item.label = item.processName;
+    });
+    return res.data;
+  });
+};
+const onReset = () => {
+  formData.value.deviceNumber = ''; // 设备号
+  formData.value.deviceId = ''; // 设备id
+  formData.value.deviceType = null; // 设备类型
+  formData.value.workshopId = null; // 车间
+  formData.value.stationIds = []; // 工段
+  formData.value.processIds = []; // 工序
+  formData.value.stationprocessIds = []; // 工段&工序
+  formData.value.power = null; // 功率
+  formData.value.id = null;
 };
 // 选中行
 const handleRowClick = ({ row }) => {
@@ -225,6 +260,7 @@ const getList = (obj: object) => {
   });
 };
 const handleClick = (row) => {
+  onReset();
   if (row.deviceNumber) {
     drawer.value = `编辑设备`;
     formData.value.deviceNumber = row.deviceNumber;
@@ -232,25 +268,33 @@ const handleClick = (row) => {
     formData.value.deviceType = Number(row.deviceType);
     formData.value.workshopId = Number(row.workshopId);
     console.log(row.tree.map((item) => item.id));
-    formData.value.stationIds = row.tree.map((item) => Number(item.id));
-    handleChange(formData.value.stationIds);
-    row.tree.forEach((item) => {
-      if (item.child) {
-        formData.value.processIds = formData.value.processIds.concat(item.child.map((itemRen) => Number(itemRen.id)));
-      }
-    });
     formData.value.power = row.power;
+    const parentIds = row.tree.map((item) => Number(item.id));
+    selectProcessGet({ parentIds, status: 0 }).then((res) => {
+      res.data.forEach((item) => {
+        item.value = `${item.parentId}-${item.id}`;
+        item.label = item.processName;
+      });
+      parentIds.forEach((item) => {
+        const children = res.data.filter((itemRen) => item === itemRen.parentId && itemRen);
+        const findIndex = TYPE_STATION_IDS.value.findIndex((itemRen) => itemRen.id === item);
+        TYPE_STATION_IDS.value[findIndex].children = children;
+      });
+      row.tree.forEach((item) => {
+        if (item.child) {
+          item.child.forEach((itemRen) => {
+            formData.value.stationprocessIds.push(`${itemRen.pid}-${itemRen.id}`);
+          });
+        } else {
+          formData.value.stationprocessIds.push(item.id);
+        }
+      });
+      visible.value = true;
+    });
   } else {
+    visible.value = true;
     drawer.value = `新增设备`;
-    formData.value.deviceNumber = null;
-    formData.value.deviceId = null;
-    formData.value.deviceType = null;
-    formData.value.workshopId = null;
-    formData.value.stationIds = [];
-    formData.value.processIds = [];
-    formData.value.power = null;
   }
-  visible.value = true;
 };
 const rehandleChange = (changeParams) => {
   const { current, pageSize } = changeParams.pagination;
@@ -260,6 +304,12 @@ const handleClose = () => {
   visible.value = false;
 };
 const onSubmit = (type) => {
+  formData.value.stationprocessIds.forEach((item) => {
+    formData.value.stationIds.push(item.split('-')[0]);
+    formData.value.processIds.push(item.split('-')[1]);
+  });
+  formData.value.stationIds = [...new Set(formData.value.stationIds)];
+  formData.value.processIds = [...new Set(formData.value.processIds)];
   // type 保存状态 0：保存 1保存并新增 2保存并复制
   formData.value.id = type ? null : chooseRow.value.id;
   formRef.value.validate().then((res) => {
@@ -268,13 +318,7 @@ const onSubmit = (type) => {
         if (type) {
           MessagePlugin.success('新增成功');
           if (type === 1) {
-            formData.value.deviceNumber = '';
-            formData.value.deviceId = '';
-            formData.value.deviceType = '';
-            formData.value.workshopId = '';
-            formData.value.stationIds = [];
-            formData.value.processIds = [];
-            formData.value.power = '';
+            onReset();
           }
         } else {
           MessagePlugin.success('保存成功');

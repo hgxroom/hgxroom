@@ -73,6 +73,12 @@ const pagination = ref({
   pageSize: 20,
   total: 0,
   current: 1,
+  pageSizeOptions: [
+    { label: '10条/页', value: 10 },
+    { label: '20条/页', value: 20 },
+    { label: '50条/页', value: 50 },
+    { label: '100条/页', value: 100 },
+  ],
 });
 const rules = {
   workshopNumber: [{ required: true, message: '用户名必填' }],

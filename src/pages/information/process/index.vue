@@ -39,7 +39,7 @@
       destroy-on-close
     >
       <t-form ref="formRef" :data="formData" :rules="rules" label-align="top">
-        <t-form-item label="工段" name="parentId ">
+        <t-form-item label="工段" name="parentId">
           <t-select v-model="formData.parentId" placeholder="请选择类型" class="demo-select-base" clearable>
             <t-option v-for="item in TYPE_OPTIONS" :key="item.id" :value="item.id" :label="item.processName">
               {{ item.processName }}
@@ -69,8 +69,8 @@ const chooseRow = ref(null); // 编辑行
 const data = ref([]);
 const TYPE_OPTIONS = ref([]);
 const INITIAL_DATA = {
-  parentId: '',
-  processName: '',
+  parentId: null,
+  processName: null,
   id: null,
 };
 const drawer = ref(`新增工序`); // 抽屉标签
@@ -78,10 +78,19 @@ const pagination = ref({
   pageSize: 20,
   total: 0,
   current: 1,
+  pageSizeOptions: [
+    { label: '10条/页', value: 10 },
+    { label: '20条/页', value: 20 },
+    { label: '50条/页', value: 50 },
+    { label: '100条/页', value: 100 },
+  ],
 });
 const rules = {
   parentId: [{ required: true, message: '工段必填' }],
-  processName: [{ required: true, message: '工序必填' }],
+  processName: [
+    { required: true, message: '工序必填' },
+    { pattern: /^[\u4e00-\u9fa5]{1,10}$/, message: '最多10个汉字' },
+  ],
 };
 const formData = ref({ ...INITIAL_DATA });
 
@@ -128,7 +137,7 @@ const handleRowClick = ({ row }) => {
 const getSection = () => {
   // 下拉框数据 工段
   selectProcessGet({ parentIds: [0], status: 0 }).then((res) => {
-    TYPE_OPTIONS.value = res.data.data;
+    TYPE_OPTIONS.value = res.data;
   });
 };
 const getList = (obj: object) => {

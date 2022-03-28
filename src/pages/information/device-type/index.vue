@@ -70,12 +70,21 @@ const INITIAL_DATA = {
 };
 const drawer = ref(`新增设备类型`);
 const pagination = ref({
-  pageSize: 5,
+  pageSize: 20,
   total: 0,
-  current: 0,
+  current: 1,
+  pageSizeOptions: [
+    { label: '10条/页', value: 10 },
+    { label: '20条/页', value: 20 },
+    { label: '50条/页', value: 50 },
+    { label: '100条/页', value: 100 },
+  ],
 });
 const rules = {
-  deviceTypeName: [{ required: true, message: '设备类型必填' }],
+  deviceTypeName: [
+    { required: true, message: '设备类型必填' },
+    { pattern: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,10}$/, message: '最多10个汉字、数字或字母' },
+  ],
 };
 const formData = ref({ ...INITIAL_DATA });
 
