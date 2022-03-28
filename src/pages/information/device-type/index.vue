@@ -23,7 +23,28 @@
             <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
             <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
             <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
-            <a v-else class="t-button-link" @click="handleClickDelete(row)">删除</a>
+            <t-popconfirm
+              v-else
+              class="t-button-link"
+              :visible="row.visible"
+              theme="default"
+              content="是否删除?"
+              @Cancel="
+                () => {
+                  row.visible = false;
+                }
+              "
+              @Confirm="handleClickDelete(row)"
+            >
+              <a
+                @click="
+                  () => {
+                    row.visible = true;
+                  }
+                "
+                >删除</a
+              >
+            </t-popconfirm>
             <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
           </template>
         </t-table>
@@ -189,6 +210,7 @@ const handleClickDelete = (row) => {
         data.value.splice(index, 1);
       }
     });
+    row.visible = false;
     MessagePlugin.success('删除成功');
   });
 };

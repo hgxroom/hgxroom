@@ -16,9 +16,9 @@
         >
           <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
           <template #deviceType="{ row }">
-            <span class="span--normal">{{
-              TYPE_DEVICE[TYPE_DEVICE.findIndex((item) => item.id === row.deviceType)].deviceTypeName
-            }}</span>
+            <span class="span--normal">
+              {{ TYPE_DEVICE[TYPE_DEVICE.findIndex((item) => item.id === row.deviceType)].deviceTypeName }}
+            </span>
           </template>
           <template #status="{ row }">
             <span v-show="row.status === 0" class="span--normal">正常</span>
@@ -26,9 +26,8 @@
           </template>
           <template #tree="{ row }">
             <span v-for="item in row.tree" :key="item.id">
-              {{ item.name }}
               <a v-if="item.child" class="t-button-link" @click="ondialog(item.child)">
-                {{ item.child.length }}
+                <t-tooltip :content="item.content"> {{ item.name }}{{ item.child.length }}</t-tooltip>
               </a>
             </span>
           </template>
@@ -36,7 +35,28 @@
             <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
             <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
             <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
-            <a v-else class="t-button-link" @click="handleClickDelete(row)">删除</a>
+            <t-popconfirm
+              v-else
+              class="t-button-link"
+              :visible="row.visible"
+              theme="default"
+              content="是否删除?"
+              @Cancel="
+                () => {
+                  row.visible = false;
+                }
+              "
+              @Confirm="handleClickDelete(row)"
+            >
+              <a
+                @click="
+                  () => {
+                    row.visible = true;
+                  }
+                "
+                >删除</a
+              >
+            </t-popconfirm>
             <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
           </template>
         </t-table>
@@ -121,7 +141,7 @@ const TYPE_DEVICE = ref([]); // 设备类型
 const TYPE_WORKSHOP = ref([]); // 车间
 const INITIAL_DATA = {
   deviceNumber: '', // 设备号
-  deviceId: '', // 设备id
+  deviceId: null, // 设备id
   deviceType: null, // 设备类型
   workshopId: null, // 车间
   stationIds: [], // 工段
@@ -220,7 +240,6 @@ const getSection = (obj) => {
       item.value = String(item.id);
       item.label = item.processName;
       item.children = true;
-      if (item.id === 10002) item.children = [{ label: '测试', value: 1 }];
     });
     TYPE_STATION_IDS.value = res.data;
     console.log(TYPE_STATION_IDS.value, 258);
@@ -237,7 +256,7 @@ const load = (node) => {
 };
 const onReset = () => {
   formData.value.deviceNumber = ''; // 设备号
-  formData.value.deviceId = ''; // 设备id
+  formData.value.deviceId = null; // 设备id
   formData.value.deviceType = null; // 设备类型
   formData.value.workshopId = null; // 车间
   formData.value.stationIds = []; // 工段
@@ -256,6 +275,15 @@ const getList = (obj: object) => {
     pagination.value.pageSize = list.size;
     pagination.value.total = list.total;
     pagination.value.current = list.current;
+    list.records.forEach((item) => {
+      item.tree.forEach((itemRen) => {
+        if (itemRen.child) {
+          itemRen.content = itemRen.child.map((itemRen) => `工序：${itemRen.name}`).join('--');
+        } else {
+          itemRen.content = '';
+        }
+      });
+    });
     data.value = list.records;
   });
 };
@@ -349,10 +377,12 @@ const handleClickDelete = (row) => {
       }
     });
     MessagePlugin.success('删除成功');
+    row.visible = false;
   });
 };
 onMounted(() => {
   selectDeviceTypeGet({ parentIds: [0], status: 0 }).then((res) => {
+    console.log(res.data);
     TYPE_DEVICE.value = res.data;
   });
   selectWorkshopGet({ parentIds: [0], status: 0 }).then((res) => {

@@ -23,7 +23,28 @@
             <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
             <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
             <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
-            <a v-else class="t-button-link" @click="handleClickDelete(row)">删除</a>
+            <t-popconfirm
+              v-else
+              class="t-button-link"
+              :visible="row.visible"
+              theme="default"
+              content="是否删除?"
+              @Cancel="
+                () => {
+                  row.visible = false;
+                }
+              "
+              @Confirm="handleClickDelete(row)"
+            >
+              <a
+                @click="
+                  () => {
+                    row.visible = true;
+                  }
+                "
+                >删除</a
+              >
+            </t-popconfirm>
             <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
           </template>
         </t-table>
@@ -81,8 +102,17 @@ const pagination = ref({
   ],
 });
 const rules = {
-  workshopNumber: [{ required: true, message: '用户名必填' }],
-  workshopName: [{ required: true, message: '用户名必填' }],
+  workshopNumber: [
+    { required: true, message: '用户名必填' },
+    { pattern: /^[a-zA-Z0-9]{1,8}$/, message: '可输入数字，字母，其余不可输入，最多可输入8个字符' },
+  ],
+  workshopName: [
+    { required: true, message: '用户名必填' },
+    {
+      pattern: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,10}$/,
+      message: '可输入数字，文字，字母，其余不可输入，最多可输入10个字符',
+    },
+  ],
 };
 const formData = ref({ ...INITIAL_DATA });
 
@@ -195,6 +225,7 @@ const handleClickDelete = (row) => {
         data.value.splice(index, 1);
       }
     });
+    row.visible = false;
     MessagePlugin.success('删除成功');
   });
 };
