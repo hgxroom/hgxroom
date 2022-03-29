@@ -173,6 +173,7 @@ import type { Ref } from 'vue';
 import { getOrderList, getInfoProcess, getFabricsList, enterLabel, updateStatus } from '@/api/production/dyeing-order';
 import TitleHeader from '../components/TitleHeader.vue';
 import { useUserStore } from '@/store';
+import { socket } from '@/utils/socket';
 
 const userStore = useUserStore();
 
@@ -447,8 +448,7 @@ function onClickRowDyeingList({ row, index }) {
 function useWebsocket() {
   const compId = userStore.userInfo.companyId;
   const { token } = userStore;
-  ws = new WebSocket(`ws://192.168.1.40:7600/xiyou-digital-server/websocket/${compId}`, [token]);
-  // const ws = new WebSocket(`ws://192.168.1.81:7600/xiyou-digital-server/websocket/${compId}`);
+  ws = new WebSocket(`${socket}/xiyou-digital-server/websocket/${compId}`, [token]);
   ws.onopen = () => {
     console.log('连接成功');
     ws.send('Hello server!');

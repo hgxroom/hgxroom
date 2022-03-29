@@ -315,7 +315,7 @@ onMounted(() => {
       background-size: auto 100%;
     }
     &.inspection {
-      background: url('@/assets/images/process-inspection.png') center no-repeat;
+      background: url('@/assets/images/process-quality-inspection.png') center no-repeat;
       background-size: auto 100%;
     }
     &.warehousing {
