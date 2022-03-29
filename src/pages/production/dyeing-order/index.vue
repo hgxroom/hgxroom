@@ -3,28 +3,37 @@
     <div class="dyeing-order-top">
       <div class="dyeing-order-top__title">订单列表</div>
       <div class="dyeing-order-top__btn-group">
-        <t-button variant="outline" theme="default" @click="visibleColumnSetModal = true">设置字段</t-button>
-        <t-button theme="primary" @click="visiblePrepareModal = true">备胚</t-button>
-        <t-button theme="primary">入库</t-button>
+        <!-- TODO:设置字段待做  @计智谋-->
+        <!-- <t-button variant="outline" theme="default" @click="visibleColumnSetModal = true">设置字段</t-button> -->
+        <t-button theme="primary" @click="clickBpBtn">备胚</t-button>
+        <t-button theme="primary" @click="clickUpdateState">入库</t-button>
       </div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
-        <div class="dyeing-order-content__list__filter">
-          <t-select v-model="listState" :options="listStateOptions" />
-          <t-select></t-select>
+        <div class="dyeing-order-content__list-filter">
+          <t-select v-model="searchListState" :options="listStateOptions" />
+          <t-select v-model="searchType" :options="searchTypeOptions"></t-select>
           <div class="search-btn-group">
-            <t-input placeholder="请输入查询内容" />
-            <t-button shape="square" variant="outline">
+            <t-input v-model="searchContent" placeholder="请输入查询内容" />
+            <t-button shape="square" variant="outline" @click="getDyeingOrderList">
               <template #icon>
                 <t-icon name="search"></t-icon>
               </template>
             </t-button>
           </div>
         </div>
-        <div class="dyeing-order-content__list__content">
-          <t-table row-key="vatCode" :columns="listColumns"></t-table>
-          <t-pagination></t-pagination>
+        <div class="dyeing-order-content__list-content">
+          <t-table
+            row-key="id"
+            :data="dyeingOrderList"
+            :columns="listColumns"
+            :pagination="dyeingPagination"
+            :hover="true"
+            :rowClassName="rowClassName"
+            :onRowClick="onClickRowDyeingList"
+            @change="onChangeDyeingPagination"
+          ></t-table>
         </div>
       </div>
 
@@ -97,33 +106,33 @@
           </t-form>
           <t-form labelWidth="64px">
             <t-form-item label="面料名称">
-              <t-input readonly v-model="baseInfo.liningName" placeholder="未获取到此信息"></t-input>
+              <t-textarea readonly v-model="baseInfo.liningName" placeholder="未获取到此信息"></t-textarea>
             </t-form-item>
             <t-form-item label="工艺路线">
               <t-textarea readonly v-model="baseInfo.processRoute" placeholder="未获取到此信息"></t-textarea>
             </t-form-item>
             <t-form-item label="客户要求">
-              <t-input readonly v-model="baseInfo.customerRequire" placeholder="未获取到此信息"></t-input>
+              <t-textarea readonly v-model="baseInfo.customerRequire" placeholder="未获取到此信息"></t-textarea>
             </t-form-item>
             <t-form-item label="备注">
-              <t-input readonly v-model="baseInfo.remark" placeholder="未获取到此信息"></t-input>
+              <t-textarea readonly v-model="baseInfo.remark" placeholder="未获取到此信息"></t-textarea>
             </t-form-item>
           </t-form>
         </div>
         <div class="detail-schedule">
           <TitleHeader title="生产进度">
-            <t-progress theme="line" :percentage="30" />
+            <t-progress theme="line" :percentage="detailProcessInfo.rate" />
           </TitleHeader>
         </div>
         <div class="detail-schedule-summary">
-          <div class="summary__item summary__item--blue">总匹数：24</div>
-          <div class="summary__item summary__item--yellow">总重量：2670吨</div>
-          <div class="summary__item summary__item--red">总工序：24</div>
-          <div class="summary__item summary__item--green">已完成：24</div>
-          <div class="summary__item">未完成：24</div>
+          <div class="summary__item summary__item--blue">总匹数：{{ detailProcessInfo.sumPower }}</div>
+          <div class="summary__item summary__item--yellow">总重量：{{ detailProcessInfo.sumWeight }}吨</div>
+          <div class="summary__item summary__item--red">总工序：{{ detailProcessInfo.sumProcedure }}</div>
+          <div class="summary__item summary__item--green">已完成：{{ detailProcessInfo.sumCompletePower }}</div>
+          <div class="summary__item">未完成：{{ detailProcessInfo.sumUnCompletePower }}</div>
         </div>
         <div class="detail-schedule-list">
-          <t-table row-key="vatCode" :columns="scheduleColumns"></t-table>
+          <t-table row-key="seq" :data="detailProcessInfo.details" :columns="scheduleColumns"></t-table>
         </div>
       </div>
     </div>
@@ -142,31 +151,51 @@
       v-model:visible="visiblePrepareModal"
       header="备胚"
       draggable
-      :on-confirm="() => (visiblePrepareModal = false)"
+      width="800px"
+      :onClose="onCloseBpDialog"
+      :onConfirm="clickBpConfirm"
     >
       <template #body>
-        <div>备胚</div>
+        <div>
+          <t-table row-key="id" :columns="bpColumns" :data="bpData" height="350">
+            <template #rfid="{ row, rowIndex }">
+              <t-input :status="row.status" v-model="row.rfid" @click="clickBpInput(rowIndex)"></t-input>
+            </template>
+          </t-table>
+        </div>
       </template>
     </t-dialog>
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
+import type { Ref } from 'vue';
+import { getOrderList, getInfoProcess, getFabricsList, enterLabel, updateStatus } from '@/api/production/dyeing-order';
 import TitleHeader from '../components/TitleHeader.vue';
-// 订单列表筛选
+import { useUserStore } from '@/store';
+
+const userStore = useUserStore();
+
 const listStateOptions = [
-  {
-    label: '全部',
-    value: '0',
-  },
+  { label: '全部', value: '0' },
   { label: '未开始', value: '1' },
   { label: '进行中', value: '2' },
   { label: '已完成', value: '3' },
 ];
-const listState = ref('2');
 
-const visibleColumnSetModal = ref(false);
-// 订单列表
+const searchTypeOptions = [
+  { label: '缸号', value: '0' },
+  { label: '客户', value: '1' },
+  { label: '布号', value: '2' },
+  { label: '色号', value: '3' },
+  { label: '色称', value: '4' },
+  { label: '生产车间', value: '5' },
+  { label: '计划单号', value: '6' },
+  { label: '工艺类型', value: '7' },
+  { label: '加工类型', value: '8' },
+];
+
+// 订单列表配置
 const listColumns = reactive([
   {
     align: 'center',
@@ -182,16 +211,33 @@ const listColumns = reactive([
     title: '客户',
   },
 ]);
-setTimeout(() => {
-  listColumns.push({
-    colKey: 'test',
-    title: '测试',
-  });
-}, 2000);
-// 备胚
-const visiblePrepareModal = ref(false);
+
+// 列表状态默认值
+const searchListState = ref('0');
+const searchType = ref('0');
+const searchContent = ref('');
+
+type dyeingPaginationType = {
+  current: number;
+  pageSize: number;
+  total?: number;
+  size?: string;
+  theme?: string;
+};
+
+const dyeingPagination: Ref<dyeingPaginationType> = ref({
+  current: 1,
+  pageSize: 10,
+  total: 0,
+  size: 'small',
+  theme: 'simple',
+});
+
+const dyeingOrderList = ref([]);
+
 // 订单基本信息
 const INFO_DATA = {
+  id: -1,
   htXh: 0, // 意思不明
   htLzkh: '', // 翰通流转卡号
   vatCode: '', // 缸号
@@ -226,56 +272,254 @@ const INFO_DATA = {
   del: '', // 是否已删除  （0否  1 已删除）
   actualFabricWeight: '', //
 };
-const baseInfo = reactive({ ...INFO_DATA });
+
+const baseInfo = ref({ ...INFO_DATA });
 
 // 生产进度列表
 const scheduleColumns = [
   {
     align: 'center',
-    colKey: 'index',
+    colKey: 'seq',
     title: '序号',
     width: '60',
   },
   {
     align: 'center',
-    width: '60',
-    colKey: 'platform',
+    colKey: 'procedureName',
     title: '工序',
+    width: '60',
   },
   {
     align: 'center',
-    colKey: 'platform',
+    colKey: 'startTime',
     title: '开始时间',
   },
   {
     align: 'center',
-    colKey: 'platform',
+    colKey: 'useTime',
     title: '用时',
     width: '60',
   },
   {
     align: 'center',
-    colKey: 'platform',
+    colKey: 'completePower',
     title: '完成匹数',
     width: '90',
   },
   {
     align: 'center',
-    colKey: 'platform',
+    colKey: 'completeWeight',
     title: '完成重量',
     width: '90',
   },
   {
     align: 'center',
-    colKey: 'platform',
+    colKey: 'undonePower',
     title: '未完成匹数',
   },
   {
     align: 'center',
-    colKey: 'platform',
+    colKey: 'undoneWeight',
     title: '为完成重量',
   },
 ];
+
+const PROCESS_INFO = {
+  details: [], //	明细列表
+  rate: 0, // 总进度
+  sumCompletePower: 0, // 总已完成
+  sumPower: 0, // 总匹数
+  sumProcedure: 0, // 总工序
+  sumUnCompletePower: 0, //	未完成
+  sumWeight: 0, // 总重量
+};
+
+const detailProcessInfo = reactive({ ...PROCESS_INFO });
+
+/** 列表active状态class */
+function rowClassName({ row }) {
+  if (row.isActive) {
+    return 'table-row-active';
+  }
+  return '';
+}
+
+function setListFirstItemInfo() {
+  const firstItem = dyeingOrderList.value[0];
+  firstItem.isActive = true;
+  baseInfo.value = firstItem;
+  getInfoProcess(firstItem.id).then((res) => {
+    const { data } = res;
+    Object.assign(detailProcessInfo, data);
+    // console.log(detailProcessInfo);
+  });
+}
+
+function resetInfo() {
+  baseInfo.value = { ...INFO_DATA };
+  Object.assign(detailProcessInfo, PROCESS_INFO);
+}
+
+function getDyeingOrderList(paginationVal = dyeingPagination.value) {
+  resetInfo();
+  const data = {
+    status: searchListState.value,
+    type: searchType.value,
+    content: searchContent.value,
+    page: paginationVal.current,
+    size: paginationVal.pageSize,
+  };
+  getOrderList(data).then((res) => {
+    const { data } = res;
+    dyeingOrderList.value = data.records;
+    dyeingPagination.value = {
+      ...dyeingPagination.value,
+      ...paginationVal,
+      total: data.total,
+    };
+    setListFirstItemInfo();
+  });
+}
+
+function onChangeDyeingPagination(changeParams, triggerAndData) {
+  const { trigger } = triggerAndData;
+  if (trigger === 'pagination') {
+    const { current, pageSize } = changeParams.pagination;
+    const pagination = { current, pageSize };
+    getDyeingOrderList(pagination);
+  }
+}
+
+// 备胚
+const visiblePrepareModal = ref(false);
+const bpColumns = [
+  {
+    align: 'center',
+    colKey: 'id',
+    title: 'ID',
+  },
+  {
+    align: 'center',
+    colKey: 'orderId',
+    title: '订单ID',
+  },
+  {
+    align: 'center',
+    colKey: 'rfid',
+    title: 'RFid',
+  },
+  {
+    colKey: 'fabricNumber',
+    title: '匹号',
+  },
+  {
+    colKey: 'fabricWeight',
+    title: '匹重',
+  },
+];
+const bpData = ref([]);
+const bpListActiveIndex = ref(0);
+let ws = null;
+
+function onClickRowDyeingList({ row, index }) {
+  if (row.isActive) {
+    return;
+  }
+  // 重置
+  dyeingOrderList.value.forEach((item, i) => {
+    if (i === index) {
+      item.isActive = true;
+    } else {
+      item.isActive = false;
+    }
+  });
+  baseInfo.value = row;
+  getInfoProcess(row.id).then((res) => {
+    const { data } = res;
+    Object.assign(detailProcessInfo, data);
+    console.log(detailProcessInfo);
+  });
+  getFabricsList(row.id).then((res) => {
+    bpData.value = res.data;
+  });
+}
+
+function useWebsocket() {
+  const compId = userStore.userInfo.companyId;
+  const { token } = userStore;
+  ws = new WebSocket(`ws://192.168.1.40:7600/xiyou-digital-server/websocket/${compId}`, [token]);
+  // const ws = new WebSocket(`ws://192.168.1.81:7600/xiyou-digital-server/websocket/${compId}`);
+  ws.onopen = () => {
+    console.log('连接成功');
+    ws.send('Hello server!');
+  };
+  ws.onmessage = (e) => {
+    console.log(e.data);
+    if (e.data !== 'success') {
+      bpData.value[bpListActiveIndex.value].rfid = e.data;
+      bpListActiveIndex.value += 1;
+      bpData.value.forEach((item) => {
+        item.status = '';
+      });
+      bpData.value[bpListActiveIndex.value].status = 'success';
+    }
+  };
+  ws.onclose = (event) => {
+    console.log('连接关闭', event);
+  };
+  ws.onerror = (event) => {
+    console.log('连接失败', event);
+  };
+}
+
+function clickBpBtn() {
+  visiblePrepareModal.value = true;
+  bpData.value.forEach((item) => {
+    item.status = '';
+  });
+  if (bpData.value[0]) {
+    bpData.value[0].status = 'success';
+  }
+
+  useWebsocket();
+}
+
+function clickBpInput(index) {
+  bpListActiveIndex.value = index;
+  bpData.value.forEach((item) => {
+    item.status = '';
+  });
+  bpData.value[bpListActiveIndex.value].status = 'success';
+}
+
+function onCloseBpDialog() {
+  console.log('关闭');
+  bpListActiveIndex.value = 0;
+  if (ws) {
+    ws.close();
+  }
+}
+
+function clickBpConfirm() {
+  const list = bpData.value;
+  enterLabel(list).then(() => {
+    visiblePrepareModal.value = false;
+    getDyeingOrderList();
+  });
+}
+
+function clickUpdateState() {
+  const { id } = baseInfo.value;
+  updateStatus(id).then(() => {
+    getDyeingOrderList();
+  });
+}
+
+onMounted(() => {
+  getDyeingOrderList();
+});
+
+const visibleColumnSetModal = ref(false);
 </script>
 <style lang="less" scoped>
 :deep(.t-table__empty) {
@@ -317,7 +561,7 @@ const scheduleColumns = [
     width: 400px;
     padding-right: 16px;
     flex-shrink: 0;
-    &__filter {
+    &-filter {
       display: flex;
       margin-bottom: 8px;
       padding-top: 8px;
@@ -329,9 +573,12 @@ const scheduleColumns = [
       display: flex;
       column-gap: 1px;
     }
-    &__content {
+    &-content {
       :deep(.t-table) {
         margin-bottom: 16px;
+      }
+      :deep(.table-row-active) {
+        background-color: #ecf2fe;
       }
     }
   }

@@ -21,7 +21,6 @@ function filterPermissionsRouters(routes: Array<RouteRecordRaw>, roles: Array<un
       res.push(route);
     }
   });
-
   return { accessedRouters: res, removeRoutes };
 }
 

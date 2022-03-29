@@ -115,7 +115,7 @@ export default defineComponent({
     };
 
     const goHome = () => {
-      router.push('/dashboard/base');
+      router.push('/data');
     };
 
     return {

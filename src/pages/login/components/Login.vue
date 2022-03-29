@@ -34,7 +34,7 @@ import { useUserStore } from '@/store';
 const userStore = useUserStore();
 
 const INITIAL_DATA = {
-  username: 'admin',
+  username: '18000000000',
   password: '123456',
 };
 

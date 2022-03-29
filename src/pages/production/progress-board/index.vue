@@ -6,24 +6,30 @@
       <div class="progress-list__content">
         <div
           v-for="(item, index) in orderList"
-          :key="item.number"
+          :key="item.id"
           class="list-item"
           :class="{ active: item.active }"
           @click="clickOrderNum(index)"
         >
-          {{ item.number }}
+          {{ item.vatCode }}
         </div>
       </div>
     </div>
     <!-- 缸号详情 -->
     <div class="progress-info">
       <TitleHeader title="总进度">
-        <t-progress theme="line" :percentage="30" />
+        <t-progress theme="line" :percentage="allRate" />
       </TitleHeader>
       <div class="progress-info__step">
-        <div class="single-step" v-for="item in setpList" :key="item.id">
-          <t-progress theme="circle" :percentage="item.schedule" :size="item.active ? 'large' : 'medium'" />
-          <div class="">{{ item.label }}</div>
+        <div
+          class="single-step"
+          :class="item.active ? 'single-step--active' : ''"
+          v-for="(item, index) in setpList"
+          :key="item.seq"
+          @click="clickProcess(item.procedureId, index)"
+        >
+          <t-progress theme="circle" :percentage="item.rate" />
+          <div class="">{{ item.procedureName }}</div>
         </div>
       </div>
       <div class="progress-info__list">
@@ -35,111 +41,128 @@
               <div>开始时间</div>
             </div>
             <div class="detail-list__content">
-              <t-steps layout="vertical" theme="dot" :current="1" readonly>
-                <t-step-item title="AE36473647" />
-                <t-step-item title="AE36473647" />
-                <t-step-item title="AE36473647" />
-                <t-step-item title="AE36473647" />
+              <t-steps layout="vertical" theme="dot" :current="procedureActive" readonly>
+                <t-step-item v-for="(item, index) in procedureList" :key="index" :title="item.sequenceNumber" />
               </t-steps>
-              <t-steps class="no-line" layout="vertical" theme="dot" :current="1" readonly>
-                <t-step-item title="2022-2-21 12:23" />
-                <t-step-item title="2022-2-21 12:23" />
-                <t-step-item title="2022-2-21 12:23" />
-                <t-step-item title="2022-2-21 12:23" />
+              <t-steps class="no-line" layout="vertical" theme="dot" :current="procedureActive" readonly>
+                <t-step-item v-for="(item, index) in procedureList" :key="index" :title="item.updateTime" />
               </t-steps>
             </div>
           </div>
-          <div class="detail-image"></div>
+          <!-- <t-loading class="detail-image-loading" size="medium" :loading="true">
+
+          </t-loading> -->
+          <div class="detail-image" :class="processBg"></div>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { getAllVatCode, getBoardListInfo } from '@/api/production/progress-board';
+import { getInfoProcess } from '@/api/production/dyeing-order';
+
 import TitleHeader from '../components/TitleHeader.vue';
 
 const orderList = ref([]);
-orderList.value = [
-  { number: 'H37483741', active: false },
-  { number: 'H37483742', active: false },
-  { number: 'H37483743', active: false },
-  { number: 'H37483744', active: true },
-  { number: 'H37483745', active: false },
-  { number: 'H37483746', active: false },
-  { number: 'H37483747', active: false },
-  { number: 'H37483748', active: false },
-  { number: 'H37483749', active: false },
-  { number: 'H37483750', active: false },
-  { number: 'H37483751', active: false },
-  { number: 'H37483752', active: false },
-  { number: 'H37483753', active: false },
-  { number: 'H37483754', active: false },
-  { number: 'H37483755', active: false },
-  { number: 'H37483756', active: false },
-  { number: 'H37483757', active: false },
-  { number: 'H37483758', active: false },
-  { number: 'H37483759', active: false },
-  { number: 'H37483760', active: false },
-  { number: 'H37483761', active: false },
-  { number: 'H37483762', active: false },
-];
+// 工序环形图
+const setpList = ref([]);
+const allRate = ref(0);
+
+const procedureList = ref([]);
+const procedureActive = ref(0); // 下标0开始
+const activeProcess = ref('');
+
+/** 获取工序的具体详情 */
+function getProcessInfo(pId) {
+  const activeId = orderList.value.find((item) => item.active).id;
+  const data = {
+    orderId: activeId,
+    procedureId: pId,
+  };
+  getBoardListInfo(data).then((res) => {
+    procedureList.value = res.data;
+    res.data.forEach((item, index) => {
+      if (item.flag === 1) {
+        procedureActive.value = index;
+      }
+    });
+  });
+}
+
+/** 点击某个工序 */
+function clickProcess(id, index) {
+  if (setpList.value[index].active) {
+    return;
+  }
+
+  setpList.value.forEach((item) => {
+    item.active = false;
+  });
+  setpList.value[index].active = true;
+  activeProcess.value = setpList.value[index].procedureName;
+  getProcessInfo(id);
+}
+
+/** 获取右侧顶部总进度和工序进度 */
+function getProcessList(id) {
+  getInfoProcess(id)
+    .then((res) => {
+      setpList.value = res.data.details;
+      allRate.value = res.data.rate;
+    })
+    .then(() => {
+      clickProcess(setpList.value[0].procedureId, 0);
+    });
+}
+/** 获取左侧缸号列表 */
+function getVatList() {
+  getAllVatCode().then((res) => {
+    const { data } = res;
+    data.forEach((item) => {
+      item.active = false;
+    });
+    data[0].active = true;
+    orderList.value = data;
+    getProcessList(data[0].id);
+  });
+}
+
 function clickOrderNum(index: number) {
+  if (orderList.value[index].active) {
+    return;
+  }
   orderList.value.forEach((item) => {
     item.active = false;
   });
-  orderList.value[index].active = true;
+  const currentItem = orderList.value[index];
+  currentItem.active = true;
+  getProcessList(currentItem.id);
 }
-// 步骤进度图
-const setpList = ref([]);
-setpList.value = [
-  {
-    id: 1,
-    label: '备胚',
-    schedule: 30,
-  },
-  {
-    id: 2,
-    label: '定胚',
-    schedule: 40,
-  },
-  {
-    id: 3,
-    label: 'XX',
-    schedule: 50,
-    active: true,
-  },
-  {
-    id: 4,
-    label: 'YY',
-    schedule: 60,
-  },
-  {
-    id: 5,
-    label: 'YY',
-    schedule: 60,
-  },
-  {
-    id: 6,
-    label: 'YY',
-    schedule: 60,
-  },
-  {
-    id: 7,
-    label: 'YY',
-    schedule: 60,
-  },
-  {
-    id: 8,
-    label: 'YY',
-    schedule: 60,
-  },
-  {
-    id: 9,
-    label: 'YY',
-    schedule: 60,
-  },
-];
+
+const processBg = computed(() => {
+  const actText = activeProcess.value;
+  let resultClass = '';
+  if (actText.indexOf('毛胚') > -1) {
+    resultClass = 'hair_embryo';
+  } else if (actText.indexOf('染色') > -1) {
+    resultClass = 'dyeing';
+  } else if (actText.indexOf('整理') > -1) {
+    resultClass = 'tidy';
+  } else if (actText.indexOf('物测') > -1) {
+    resultClass = 'physical_test';
+  } else if (actText.indexOf('品检') > -1) {
+    resultClass = 'inspection';
+  } else if (actText.indexOf('入库') > -1) {
+    resultClass = 'warehousing';
+  }
+  return resultClass;
+});
+
+onMounted(() => {
+  getVatList();
+});
 </script>
 <style lang="less" scoped>
 .app-container {
@@ -211,6 +234,7 @@ setpList.value = [
   &__step {
     display: flex;
     overflow-x: scroll;
+    overflow-y: hidden;
     margin: 0 40px;
     &::-webkit-scrollbar {
       width: 12px;
@@ -229,6 +253,12 @@ setpList.value = [
     align-items: center;
     justify-content: center;
     margin: 10px 20px;
+    width: 160px;
+    height: 180px;
+    transition: all 0.2s;
+    &--active {
+      transform: scale(1.2);
+    }
   }
   &__list {
     padding: 15px 10px;
@@ -259,11 +289,39 @@ setpList.value = [
       }
     }
   }
+  .detail-image-loading {
+    width: 100%;
+    height: 500px;
+  }
   .detail-image {
     width: 100%;
     height: 500px;
     background: url('@/assets/images/process-dyeing.png') center no-repeat;
     background-size: auto 100%;
+    &.hair_embryo {
+      background: url('@/assets/images/process-hair-embryo.png') center no-repeat;
+      background-size: auto 100%;
+    }
+    &.dyeing {
+      background: url('@/assets/images/process-dyeing.png') center no-repeat;
+      background-size: auto 100%;
+    }
+    &.tidy {
+      background: url('@/assets/images/process-tidy.png') center no-repeat;
+      background-size: auto 100%;
+    }
+    &.physical_test {
+      background: url('@/assets/images/process-physical-test.png') center no-repeat;
+      background-size: auto 100%;
+    }
+    &.inspection {
+      background: url('@/assets/images/process-inspection.png') center no-repeat;
+      background-size: auto 100%;
+    }
+    &.warehousing {
+      background: url('@/assets/images/process-warehousing.png') center no-repeat;
+      background-size: auto 100%;
+    }
   }
 }
 

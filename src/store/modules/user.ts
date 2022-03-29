@@ -5,6 +5,7 @@ import { login, getInfo } from '@/api/auth';
 
 const InitUserInfo = {
   roles: [],
+  companyId: '',
 };
 
 export const useUserStore = defineStore('user', {

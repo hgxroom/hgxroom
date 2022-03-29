@@ -9,7 +9,7 @@
           <t-button theme="default" shape="square" variant="text" @click="changeCollapsed">
             <t-icon class="collapsed-icon" name="view-list" />
           </t-button>
-          <search :layout="layout" />
+          <!-- <search :layout="layout" /> -->
         </div>
       </template>
       <MenuContent v-show="layout !== 'side'" class="header-menu" :nav-data="menu" />
@@ -19,7 +19,7 @@
           <search v-if="layout !== 'side'" :layout="layout" />
 
           <!-- 全局通知 -->
-          <notice />
+          <!-- <notice /> -->
 
           <!-- <t-tooltip placement="bottom" content="代码仓库">
             <t-button theme="default" shape="square" variant="text" @click="navToGitHub">
@@ -34,9 +34,9 @@
           <t-dropdown :min-column-width="135" trigger="click">
             <template #dropdown>
               <t-dropdown-menu>
-                <t-dropdown-item class="operations-dropdown-container-item" @click="handleNav('/user/index')">
+                <!-- <t-dropdown-item class="operations-dropdown-container-item" @click="handleNav('/user/index')">
                   <t-icon name="user-circle"></t-icon>个人中心
-                </t-dropdown-item>
+                </t-dropdown-item> -->
                 <t-dropdown-item class="operations-dropdown-container-item" @click="handleLogout">
                   <t-icon name="poweroff"></t-icon>退出登录
                 </t-dropdown-item>
