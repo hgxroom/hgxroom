@@ -48,10 +48,10 @@ export function enterLabel(params) {
 }
 
 /** 改变订单状态 手动入库 */
-export function updateStatus(id) {
+export function updateStatus(data) {
   return request({
     url: `/xiyou-digital-server/order/updateStatus`,
     method: 'PUT',
-    data: { id },
+    data,
   });
 }

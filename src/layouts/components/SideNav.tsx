@@ -3,6 +3,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { prefix } from '@/config/global';
 import pgk from '../../../package.json';
 import MenuContent from './MenuContent';
+// ts中使用图片路径
+import logo from '@/assets/logo.png';
+import logoText from '@/assets/logo-text.png';
 
 import { useSettingStore } from '@/store';
 
@@ -129,6 +132,7 @@ export default defineComponent({
   },
   render() {
     const active = this.getActiveName();
+
     return (
       <div class={this.sideNavCls}>
         <t-menu
@@ -141,9 +145,9 @@ export default defineComponent({
               this.showLogo && (
                 <span class={`${prefix}-side-nav-logo-wrapper`} onClick={this.goHome}>
                   {this.collapsed ? (
-                    <img class={`${prefix}-side-nav-logo-wrapper`} src="/src/assets/logo.png" alt="" />
+                    <img class={`${prefix}-side-nav-logo-wrapper`} src={logo} />
                   ) : (
-                    <img class={`${prefix}-side-nav-logo-tdesign-logo`} src="/src/assets/logo-text.png"></img>
+                    <img class={`${prefix}-side-nav-logo-tdesign-logo`} src={logoText}></img>
                   )}
                 </span>
               ),

@@ -6,13 +6,14 @@
         <!-- TODO:设置字段待做  @计智谋-->
         <!-- <t-button variant="outline" theme="default" @click="visibleColumnSetModal = true">设置字段</t-button> -->
         <t-button theme="primary" @click="clickBpBtn">备胚</t-button>
-        <t-button theme="primary" @click="clickUpdateState">入库</t-button>
+        <t-button theme="primary" v-if="baseInfo.status === 2" @click="clickUpdateState(3)">入库</t-button>
+        <t-button theme="primary" v-if="baseInfo.status === 3" @click="clickUpdateState(2)">反入库</t-button>
       </div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
         <div class="dyeing-order-content__list-filter">
-          <t-select v-model="searchListState" :options="listStateOptions" />
+          <t-select v-model="searchListState" :options="listStateOptions" @change="listStateChange" />
           <t-select v-model="searchType" :options="searchTypeOptions"></t-select>
           <div class="search-btn-group">
             <t-input v-model="searchContent" placeholder="请输入查询内容" />
@@ -268,7 +269,7 @@ const INFO_DATA = {
   createTime: '', // 创建时间
   updateTime: '', // 更新时间
   creatorId: '', // 创建人
-  status: '', // 订单状态 1 未开始 2 进行中 3 已完成
+  status: 0, // 订单状态 1 未开始 2 进行中 3 已完成
   companyId: '', // 公司id
   del: '', // 是否已删除  （0否  1 已删除）
   actualFabricWeight: '', //
@@ -339,20 +340,22 @@ const detailProcessInfo = reactive({ ...PROCESS_INFO });
 
 /** 列表active状态class */
 function rowClassName({ row }) {
-  if (row.isActive) {
+  if (row?.isActive) {
     return 'table-row-active';
   }
   return '';
 }
 
 function setListFirstItemInfo() {
+  if (dyeingOrderList.value.length <= 0) {
+    return;
+  }
   const firstItem = dyeingOrderList.value[0];
   firstItem.isActive = true;
   baseInfo.value = firstItem;
   getInfoProcess(firstItem.id).then((res) => {
     const { data } = res;
     Object.assign(detailProcessInfo, data);
-    // console.log(detailProcessInfo);
   });
 }
 
@@ -380,6 +383,14 @@ function getDyeingOrderList(paginationVal = dyeingPagination.value) {
     };
     setListFirstItemInfo();
   });
+}
+
+/** 切换状态时请求 */
+function listStateChange() {
+  // 异步处理，触发change的时候，v-model没处理
+  setTimeout(() => {
+    getDyeingOrderList();
+  }, 0);
 }
 
 function onChangeDyeingPagination(changeParams, triggerAndData) {
@@ -438,7 +449,6 @@ function onClickRowDyeingList({ row, index }) {
   getInfoProcess(row.id).then((res) => {
     const { data } = res;
     Object.assign(detailProcessInfo, data);
-    console.log(detailProcessInfo);
   });
   getFabricsList(row.id).then((res) => {
     bpData.value = res.data;
@@ -493,7 +503,6 @@ function clickBpInput(index) {
 }
 
 function onCloseBpDialog() {
-  console.log('关闭');
   bpListActiveIndex.value = 0;
   if (ws) {
     ws.close();
@@ -506,11 +515,18 @@ function clickBpConfirm() {
     visiblePrepareModal.value = false;
     getDyeingOrderList();
   });
+  if (ws) {
+    ws.close();
+  }
 }
 
-function clickUpdateState() {
+function clickUpdateState(status) {
   const { id } = baseInfo.value;
-  updateStatus(id).then(() => {
+  const data = {
+    id,
+    status,
+  };
+  updateStatus(data).then(() => {
     getDyeingOrderList();
   });
 }
