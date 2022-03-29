@@ -89,7 +89,7 @@
           </t-select>
         </t-form-item>
         <t-form-item label="车间" name="workshopId">
-          <t-select v-model="formData.workshopId" placeholder="请选择设备类型" class="demo-select-base" clearable>
+          <t-select v-model="formData.workshopId" placeholder="请选择车间" class="demo-select-base" clearable>
             <t-option v-for="item in TYPE_WORKSHOP" :key="item.id" :value="item.id" :label="item.workshopName">
               {{ item.workshopName }}
             </t-option>
@@ -101,6 +101,7 @@
             v-model="formData.stationprocessIds"
             class="t-demo-cascader"
             :options="TYPE_STATION_IDS"
+            @change="onCascaderChange"
             clearable
             :load="load"
           />
@@ -130,6 +131,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
+import { values } from 'lodash';
 import { deviceInfoListGet, deviceInfoListDel, deviceInfoListAddOrUpdate } from '@/api/base/device-info';
 import { selectProcessGet } from '@/api/base/process';
 import { selectDeviceTypeGet } from '@/api/base/devic-type';
@@ -242,7 +244,6 @@ const getSection = (obj) => {
       item.children = true;
     });
     TYPE_STATION_IDS.value = res.data;
-    console.log(TYPE_STATION_IDS.value, 258);
   });
 };
 const load = (node) => {
@@ -253,6 +254,13 @@ const load = (node) => {
     });
     return res.data;
   });
+};
+const onCascaderChange = (value) => {
+  setTimeout(() => {
+    formData.value.stationprocessIds = value.filter((item) => {
+      return item.split('-').length > 1;
+    });
+  }, 0);
 };
 const onReset = () => {
   formData.value.deviceNumber = ''; // 设备号
@@ -336,6 +344,7 @@ const onSubmit = (type) => {
     formData.value.stationIds.push(item.split('-')[0]);
     formData.value.processIds.push(item.split('-')[1]);
   });
+  formData.value.deviceId = formData.value.deviceId ? formData.value.deviceId : null;
   formData.value.stationIds = [...new Set(formData.value.stationIds)];
   formData.value.processIds = [...new Set(formData.value.processIds)];
   // type 保存状态 0：保存 1保存并新增 2保存并复制
@@ -387,7 +396,6 @@ onMounted(() => {
     });
   }
   selectDeviceTypeGet({ parentIds: [0], status: 0 }).then((res) => {
-    console.log(res.data);
     TYPE_DEVICE.value = res.data;
   });
   selectWorkshopGet({ parentIds: [0], status: 0 }).then((res) => {
