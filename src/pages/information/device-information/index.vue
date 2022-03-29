@@ -16,9 +16,10 @@
         >
           <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
           <template #deviceType="{ row }">
-            <span class="span--normal">
+            <span v-if="TYPE_DEVICE.findIndex((item) => item.id === row.deviceType) >= 0" class="span--normal">
               {{ TYPE_DEVICE[TYPE_DEVICE.findIndex((item) => item.id === row.deviceType)].deviceTypeName }}
             </span>
+            <span v-else>类型不存在</span>
           </template>
           <template #status="{ row }">
             <span v-show="row.status === 0" class="span--normal">正常</span>
