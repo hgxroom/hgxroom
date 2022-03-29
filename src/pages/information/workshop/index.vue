@@ -209,11 +209,8 @@ const handleClickDisable = (row) => {
   const status = row.status === 0 ? -1 : 0;
   const message = status ? '禁用成功' : '启用成功';
   workshopListAddOrUpdate({ id: row.id, status }).then(() => {
-    data.value.forEach((item) => {
-      if (item === row) {
-        item.status = status;
-      }
-    });
+    row.status = status;
+    getList({ page: pagination.value.current, size: pagination.value.pageSize });
     MessagePlugin.success(message);
   });
 };
@@ -224,8 +221,9 @@ const handleClickDelete = (row) => {
         data.value.splice(index, 1);
       }
     });
-    row.visible = false;
     MessagePlugin.success('删除成功');
+    getList({ page: pagination.value.current, size: pagination.value.pageSize });
+    row.visible = false;
   });
 };
 onMounted(() => {

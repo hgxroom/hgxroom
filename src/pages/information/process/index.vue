@@ -216,24 +216,22 @@ const onSubmit = (type) => {
 const handleClickDisable = (row) => {
   const status = row.status === 0 ? -1 : 0;
   const message = status ? '禁用成功' : '启用成功';
-  processListAddOrUpdate({ id: row.id, status }).then((res) => {
-    data.value.forEach((item) => {
-      if (item === row) {
-        item.status = status;
-      }
-    });
+  processListAddOrUpdate({ id: row.id, status }).then(() => {
+    row.status = status;
+    getList({ page: pagination.value.current, size: pagination.value.pageSize });
     MessagePlugin.success(message);
   });
 };
 const handleClickDelete = (row) => {
-  processListDel({ id: row.id, del: 1 }).then((res) => {
+  processListDel({ id: row.id, del: 1 }).then(() => {
     data.value.forEach((item, index) => {
       if (item === row) {
         data.value.splice(index, 1);
       }
     });
-    row.visible = false;
     MessagePlugin.success('删除成功');
+    getList({ page: pagination.value.current, size: pagination.value.pageSize });
+    row.visible = false;
   });
 };
 onMounted(() => {
