@@ -2,7 +2,9 @@
 <template>
   <div class="dyeing-order">
     <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title"><t-button theme="primary" @click="handleClick({})">新增</t-button></div>
+      <div class="dyeing-order-top__title">
+        <t-button theme="primary" @click="handleClick({})" v-if="roleId === 1">新增</t-button>
+      </div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
@@ -81,10 +83,12 @@
 import { ref, onMounted } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { deviceTypeListGet, deviceTypeListDel, deviceTypeListAddOrUpdate } from '@/api/base/devic-type';
+import { useUserStore } from '@/store';
 
 const formRef = ref(null);
 const data = ref([]);
 const chooseRow = ref(null); // 编辑行
+const visible = ref(false);
 const INITIAL_DATA = {
   deviceTypeName: '',
   id: null,
@@ -101,6 +105,8 @@ const pagination = ref({
     { label: '100条/页', value: 100 },
   ],
 });
+const userStore = useUserStore();
+const { roleId } = userStore.userInfo;
 const rules = {
   deviceTypeName: [
     { required: true, message: '设备类型必填' },
@@ -109,7 +115,7 @@ const rules = {
 };
 const formData = ref({ ...INITIAL_DATA });
 
-const columns = [
+const columns = ref([
   {
     colKey: 'index',
     title: '序号',
@@ -134,13 +140,8 @@ const columns = [
     colKey: 'status',
     title: '状态',
   },
-  {
-    colKey: 'operation',
-    title: '操作',
-    width: 200,
-  },
-];
-const visible = ref(false);
+]);
+
 const getList = (obj: object) => {
   deviceTypeListGet(obj).then((res) => {
     const list = res.data;
@@ -215,6 +216,13 @@ const handleClickDelete = (row) => {
   });
 };
 onMounted(() => {
+  if (roleId === 1) {
+    columns.value.push({
+      colKey: 'operation',
+      title: '操作',
+      width: 200,
+    });
+  }
   getList({ page: pagination.value.current, size: pagination.value.pageSize });
 });
 </script>
@@ -240,6 +248,12 @@ onMounted(() => {
       }
     }
   }
+}
+.span--normal {
+  color: #00a870;
+}
+.span--disable {
+  color: rgba(0, 0, 0, 0.26);
 }
 a.disabled {
   pointer-events: none;

@@ -2,7 +2,9 @@
 <template>
   <div class="dyeing-order">
     <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title"><t-button theme="primary" @click="handleClick({})">新增</t-button></div>
+      <div class="dyeing-order-top__title">
+        <t-button theme="primary" @click="handleClick({})" v-if="roleId === 1">新增</t-button>
+      </div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
@@ -84,6 +86,7 @@
 import { ref, onMounted } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { selectProcessGet, processListGet, processListAddOrUpdate, processListDel } from '@/api/base/process';
+import { useUserStore } from '@/store';
 
 const formRef = ref(null);
 const chooseRow = ref(null); // 编辑行
@@ -114,8 +117,9 @@ const rules = {
   ],
 };
 const formData = ref({ ...INITIAL_DATA });
-
-const columns = [
+const userStore = useUserStore();
+const { roleId } = userStore.userInfo;
+const columns = ref([
   {
     colKey: 'index',
     title: '序号',
@@ -144,12 +148,7 @@ const columns = [
     colKey: 'status',
     title: '状态',
   },
-  {
-    colKey: 'operation',
-    title: '操作',
-    width: 200,
-  },
-];
+]);
 const visible = ref(false);
 // 选中行
 const handleRowClick = ({ row }) => {
@@ -238,6 +237,13 @@ const handleClickDelete = (row) => {
   });
 };
 onMounted(() => {
+  if (roleId === 1) {
+    columns.value.push({
+      colKey: 'operation',
+      title: '操作',
+      width: 200,
+    });
+  }
   getSection();
   getList({ page: pagination.value.current, size: pagination.value.pageSize });
 });

@@ -2,7 +2,9 @@
 <template>
   <div class="dyeing-order">
     <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title"><t-button theme="primary" @click="handleClick({})">新增</t-button></div>
+      <div class="dyeing-order-top__title">
+        <t-button theme="primary" @click="handleClick({})" v-if="roleId === 1">新增</t-button>
+      </div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
@@ -78,8 +80,9 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { MessagePlugin, Row } from 'tdesign-vue-next';
+import { MessagePlugin } from 'tdesign-vue-next';
 import { workshopListGet, workshopListDel, workshopListAddOrUpdate } from '@/api/base/workshop';
+import { useUserStore } from '@/store';
 
 const formRef = ref(null);
 const data = ref([]);
@@ -115,8 +118,9 @@ const rules = {
   ],
 };
 const formData = ref({ ...INITIAL_DATA });
-
-const columns = [
+const userStore = useUserStore();
+const { roleId } = userStore.userInfo;
+const columns = ref([
   {
     colKey: 'index',
     title: '序号',
@@ -145,12 +149,7 @@ const columns = [
     colKey: 'status',
     title: '状态',
   },
-  {
-    colKey: 'operation',
-    title: '操作',
-    width: 200,
-  },
-];
+]);
 const visible = ref(false);
 const handleRowClick = ({ row }) => {
   chooseRow.value = row;
@@ -230,6 +229,13 @@ const handleClickDelete = (row) => {
   });
 };
 onMounted(() => {
+  if (roleId === 1) {
+    columns.value.push({
+      colKey: 'operation',
+      title: '操作',
+      width: 200,
+    });
+  }
   getList({ page: pagination.value.current, size: pagination.value.pageSize });
 });
 </script>

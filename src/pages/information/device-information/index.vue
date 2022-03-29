@@ -2,7 +2,9 @@
 <template>
   <div class="dyeing-order">
     <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title"><t-button theme="primary" @click="handleClick({})">新增</t-button></div>
+      <div class="dyeing-order-top__title">
+        <t-button theme="primary" @click="handleClick({})" v-if="roleId === 1">新增</t-button>
+      </div>
     </div>
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
@@ -132,6 +134,7 @@ import { deviceInfoListGet, deviceInfoListDel, deviceInfoListAddOrUpdate } from 
 import { selectProcessGet } from '@/api/base/process';
 import { selectDeviceTypeGet } from '@/api/base/devic-type';
 import { selectWorkshopGet } from '@/api/base/workshop';
+import { useUserStore } from '@/store';
 
 const formRef = ref(null);
 const visible = ref(false);
@@ -175,8 +178,9 @@ const rules = {
   power: [{ required: true, message: '功率必选' }],
 };
 const formData = ref({ ...INITIAL_DATA });
-
-const columns = [
+const userStore = useUserStore();
+const { roleId } = userStore.userInfo;
+const columns = ref([
   {
     colKey: 'index',
     title: '序号',
@@ -221,12 +225,7 @@ const columns = [
     colKey: 'status',
     title: '状态',
   },
-  {
-    colKey: 'operation',
-    title: '操作',
-    width: 200,
-  },
-];
+]);
 const DIALOG_TABLE = ref([]); // 弹出框数据
 const DIALOG_BUTTON = ref(null);
 const visibleModal = ref(false);
@@ -382,6 +381,13 @@ const handleClickDelete = (row) => {
   });
 };
 onMounted(() => {
+  if (roleId === 1) {
+    columns.value.push({
+      colKey: 'operation',
+      title: '操作',
+      width: 200,
+    });
+  }
   selectDeviceTypeGet({ parentIds: [0], status: 0 }).then((res) => {
     console.log(res.data);
     TYPE_DEVICE.value = res.data;
@@ -415,6 +421,12 @@ onMounted(() => {
       }
     }
   }
+}
+.span--normal {
+  color: #00a870;
+}
+.span--disable {
+  color: rgba(0, 0, 0, 0.26);
 }
 a.disabled {
   pointer-events: none;
