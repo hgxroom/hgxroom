@@ -16,6 +16,7 @@ router.beforeEach(async (to, from, next) => {
   NProgress.start();
 
   const { token } = userStore;
+
   if (token) {
     if (to.path === '/login') {
       userStore.logout();

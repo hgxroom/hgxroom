@@ -34,8 +34,8 @@ import { useUserStore } from '@/store';
 const userStore = useUserStore();
 
 const INITIAL_DATA = {
-  username: '18000000000',
-  password: '123456',
+  username: '',
+  password: '',
 };
 
 const FORM_RULES = {
@@ -56,7 +56,7 @@ const onSubmit = async ({ validateResult }) => {
     MessagePlugin.success('登录成功');
     router.push({ path: '/data' });
   } catch (error) {
-    MessagePlugin.error(error.message);
+    // console.log(error, 'error');
   }
 };
 </script>

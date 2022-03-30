@@ -2,6 +2,20 @@
 @import './font-family.less';
 @import './theme/index.less';
 @import './rewrite.less';
+*::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  border: 4px solid transparent;
+  background-clip: content-box;
+  background-color: rgba(0, 0, 0, 0.25);
+  // background-color: transparent;
+}
+*:hover::-webkit-scrollbar-thumb {
+  // background-color: rgba(0, 0, 0, 0.25);
+}
 
 body {
   color: @text-color-secondary;

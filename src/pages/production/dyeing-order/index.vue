@@ -126,8 +126,8 @@
           </TitleHeader>
         </div>
         <div class="detail-schedule-summary">
-          <div class="summary__item summary__item--blue">总匹数：{{ detailProcessInfo.sumPower }}</div>
-          <div class="summary__item summary__item--yellow">总重量：{{ detailProcessInfo.sumWeight }}吨</div>
+          <!-- <div class="summary__item summary__item--blue">总匹数：{{ detailProcessInfo.sumPower }}</div> -->
+          <!-- <div class="summary__item summary__item--yellow">总重量：{{ detailProcessInfo.sumWeight }}吨</div> -->
           <div class="summary__item summary__item--red">总工序：{{ detailProcessInfo.sumProcedure }}</div>
           <div class="summary__item summary__item--green">已完成：{{ detailProcessInfo.sumCompletePower }}</div>
           <div class="summary__item">未完成：{{ detailProcessInfo.sumUnCompletePower }}</div>
@@ -322,7 +322,7 @@ const scheduleColumns = [
   {
     align: 'center',
     colKey: 'undoneWeight',
-    title: '为完成重量',
+    title: '未完成重量',
   },
 ];
 
@@ -353,8 +353,12 @@ function setListFirstItemInfo() {
   const firstItem = dyeingOrderList.value[0];
   firstItem.isActive = true;
   baseInfo.value = firstItem;
+  getFabricsList(firstItem.id).then((res) => {
+    bpData.value = res.data;
+  });
   getInfoProcess(firstItem.id).then((res) => {
     const { data } = res;
+
     Object.assign(detailProcessInfo, data);
   });
 }
@@ -456,15 +460,15 @@ function onClickRowDyeingList({ row, index }) {
 }
 
 function useWebsocket() {
-  const compId = userStore.userInfo.companyId;
+  const { companyId, id } = userStore.userInfo;
+
   const { token } = userStore;
-  ws = new WebSocket(`${socket}/xiyou-digital-server/websocket/${compId}`, [token]);
+  ws = new WebSocket(`${socket}/xiyou-digital-server/websocket/${companyId}/${id}`, [token]);
   ws.onopen = () => {
     console.log('连接成功');
     ws.send('Hello server!');
   };
   ws.onmessage = (e) => {
-    console.log(e.data);
     if (e.data !== 'success') {
       bpData.value[bpListActiveIndex.value].rfid = e.data;
       bpListActiveIndex.value += 1;

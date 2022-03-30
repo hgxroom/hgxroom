@@ -1,4 +1,6 @@
 import axios from 'axios';
+import router from '@/router';
+
 import { getToken } from '@/utils/auth';
 import proxy from '../config/proxy';
 import { showMessage } from '@/utils/notice';
@@ -9,6 +11,7 @@ const host = env === 'mock' ? '/' : proxy[env].host; // 如果是mock模式 就�
 
 const CODE = {
   REQUEST_SUCCESS: '00000',
+  TOKEN_FAIL: '401',
 };
 
 /** 请求队列 */
@@ -99,8 +102,14 @@ instance.interceptors.response.use(
     removePendingRequest(response.config, pendingRequest);
 
     const { data } = response;
+
     if (data.code === CODE.REQUEST_SUCCESS) {
       return data;
+    }
+
+    if (data.code === CODE.TOKEN_FAIL) {
+      showMessage('登录状态失效，请重新登录', 'error');
+      router.push({ path: '/login' });
     }
     showMessage(data.message, 'error');
     return Promise.reject(response);
