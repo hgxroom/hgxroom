@@ -47,7 +47,29 @@
                 >删除</a
               >
             </t-popconfirm>
-            <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
+            <a v-if="row.status === -1" class="t-button-link" @click="handleClickDisable(row)">启用</a>
+            <t-popconfirm
+              v-else
+              class="t-button-link"
+              :visible="row.disible"
+              theme="default"
+              content="是否禁用?"
+              @Cancel="
+                () => {
+                  row.disible = false;
+                }
+              "
+              @Confirm="handleClickDisable(row)"
+            >
+              <a
+                @click="
+                  () => {
+                    row.disible = true;
+                  }
+                "
+                >禁用</a
+              >
+            </t-popconfirm>
           </template>
         </t-table>
       </div>
@@ -113,7 +135,7 @@ const rules = {
   parentId: [{ required: true, message: '工段必填' }],
   processName: [
     { required: true, message: '工序必填' },
-    { pattern: /^[\u4e00-\u9fa5]{1,10}$/, message: '最多10个汉字' },
+    { pattern: /^[^\s]{1,10}$/, message: '最多10个字符，不允许空格' },
   ],
 };
 const formData = ref({ ...INITIAL_DATA });
@@ -220,6 +242,7 @@ const handleClickDisable = (row) => {
     row.status = status;
     getList({ page: pagination.value.current, size: pagination.value.pageSize });
     MessagePlugin.success(message);
+    row.disible = false;
   });
 };
 const handleClickDelete = (row) => {

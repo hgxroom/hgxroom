@@ -60,7 +60,29 @@
                 >删除</a
               >
             </t-popconfirm>
-            <a class="t-button-link" @click="handleClickDisable(row)">{{ row.status === -1 ? '启用' : '禁用' }}</a>
+            <a v-if="row.status === -1" class="t-button-link" @click="handleClickDisable(row)">启用</a>
+            <t-popconfirm
+              v-else
+              class="t-button-link"
+              :visible="row.disible"
+              theme="default"
+              content="是否禁用?"
+              @Cancel="
+                () => {
+                  row.disible = false;
+                }
+              "
+              @Confirm="handleClickDisable(row)"
+            >
+              <a
+                @click="
+                  () => {
+                    row.disible = true;
+                  }
+                "
+                >禁用</a
+              >
+            </t-popconfirm>
           </template>
         </t-table>
       </div>
@@ -131,7 +153,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
-import { values } from 'lodash';
 import { deviceInfoListGet, deviceInfoListDel, deviceInfoListAddOrUpdate } from '@/api/base/device-info';
 import { selectProcessGet } from '@/api/base/process';
 import { selectDeviceTypeGet } from '@/api/base/devic-type';
@@ -373,6 +394,7 @@ const handleClickDisable = (row) => {
     row.status = status;
     getList({ page: pagination.value.current, size: pagination.value.pageSize });
     MessagePlugin.success(message);
+    row.disable = false;
   });
 };
 const handleClickDelete = (row) => {
