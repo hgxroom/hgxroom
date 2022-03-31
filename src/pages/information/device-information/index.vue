@@ -363,8 +363,10 @@ const handleClose = () => {
 };
 const onSubmit = (type) => {
   formData.value.stationprocessIds.forEach((item) => {
-    formData.value.stationIds.push(item.split('-')[0]);
-    formData.value.processIds.push(item.split('-')[1]);
+    if (item.split('-').length === 2) {
+      formData.value.stationIds.push(item.split('-')[0]);
+      formData.value.processIds.push(item.split('-')[1]);
+    }
   });
   formData.value.deviceId = formData.value.deviceId ? formData.value.deviceId : null;
   formData.value.stationIds = [...new Set(formData.value.stationIds)];
