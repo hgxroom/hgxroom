@@ -5,9 +5,11 @@
       <div class="dyeing-order-top__btn-group">
         <!-- TODO:设置字段待做  @计智谋-->
         <!-- <t-button variant="outline" theme="default" @click="visibleColumnSetModal = true">设置字段</t-button> -->
-        <t-button theme="primary" @click="clickBpBtn">备胚</t-button>
-        <t-button theme="primary" v-if="baseInfo.status === 2" @click="clickUpdateState(3)">入库</t-button>
-        <t-button theme="primary" v-if="baseInfo.status === 3" @click="clickUpdateState(2)">反入库</t-button>
+        <template v-if="roleId === 1">
+          <t-button theme="primary" @click="clickBpBtn">备胚</t-button>
+          <t-button theme="primary" v-if="baseInfo.status === 2" @click="clickUpdateState(3)">入库</t-button>
+          <t-button theme="primary" v-if="baseInfo.status === 3" @click="clickUpdateState(2)">反入库</t-button>
+        </template>
       </div>
     </div>
     <div class="dyeing-order-content">
@@ -171,12 +173,14 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
 import type { Ref } from 'vue';
+import dayjs from 'dayjs';
 import { getOrderList, getInfoProcess, getFabricsList, enterLabel, updateStatus } from '@/api/production/dyeing-order';
 import TitleHeader from '../components/TitleHeader.vue';
 import { useUserStore } from '@/store';
 import { socket } from '@/utils/socket';
 
 const userStore = useUserStore();
+const { roleId } = userStore.userInfo;
 
 const listStateOptions = [
   { label: '全部', value: '0' },
@@ -299,8 +303,8 @@ const scheduleColumns = [
   {
     align: 'center',
     colKey: 'useTime',
-    title: '用时',
-    width: '60',
+    title: '用时(分钟)',
+    width: '100',
   },
   {
     align: 'center',
@@ -358,6 +362,20 @@ function setListFirstItemInfo() {
   });
   getInfoProcess(firstItem.id).then((res) => {
     const { data } = res;
+    data.rate *= 100;
+    data.details.forEach((item, index) => {
+      if (index !== 0 && item.startTime) {
+        const nowTime = dayjs(item.startTime, 'YYYY-MM-DD HH:mm:ss').unix();
+        // 如果上一条数据不存在，直接跳出
+        if (!data.details[index - 1].startTime) {
+          return;
+        }
+        const preTime = dayjs(data.details[index - 1].startTime, 'YYYY-MM-DD HH:mm:ss').unix();
+        let useTime = (nowTime - preTime) / 60;
+        useTime = useTime < 0 ? 0 : useTime;
+        data.details[index - 1].useTime = useTime.toFixed(0);
+      }
+    });
 
     Object.assign(detailProcessInfo, data);
   });
@@ -452,6 +470,20 @@ function onClickRowDyeingList({ row, index }) {
   baseInfo.value = row;
   getInfoProcess(row.id).then((res) => {
     const { data } = res;
+    data.rate *= 100;
+    data.details.forEach((item, index) => {
+      if (index !== 0 && item.startTime) {
+        const nowTime = dayjs(item.startTime, 'YYYY-MM-DD HH:mm:ss').unix();
+        // 如果上一条数据不存在，直接跳出
+        if (!data.details[index - 1].startTime) {
+          return;
+        }
+        const preTime = dayjs(data.details[index - 1].startTime, 'YYYY-MM-DD HH:mm:ss').unix();
+        let useTime = (nowTime - preTime) / 60;
+        useTime = useTime < 0 ? 0 : useTime;
+        data.details[index - 1].useTime = useTime.toFixed(0);
+      }
+    });
     Object.assign(detailProcessInfo, data);
   });
   getFabricsList(row.id).then((res) => {

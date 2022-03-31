@@ -207,6 +207,7 @@ const columns = ref([
   {
     colKey: 'index',
     title: '序号',
+    width: '80',
   },
   {
     colKey: 'deviceNumber',

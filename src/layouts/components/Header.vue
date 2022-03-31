@@ -52,11 +52,11 @@
               </div>
             </t-button>
           </t-dropdown>
-          <t-tooltip placement="bottom" content="系统设置">
+          <!-- <t-tooltip placement="bottom" content="系统设置">
             <t-button theme="default" shape="square" variant="text">
               <t-icon name="setting" @click="toggleSettingPanel" />
             </t-button>
-          </t-tooltip>
+          </t-tooltip> -->
         </div>
       </template>
     </t-head-menu>

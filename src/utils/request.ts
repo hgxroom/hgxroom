@@ -60,7 +60,7 @@ instance.interceptors.request.use(
     // 为每个请求都携带token  [`Token`]为自定义key，可以更改
     const token = getToken();
     if (token) {
-      config.headers.user_token = `${token}`;
+      config.headers.userToken = `${token}`;
     }
     // 请求类型处理
     const method = config.method.toLowerCase();

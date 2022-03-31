@@ -30,6 +30,7 @@ router.beforeEach(async (to, from, next) => {
     if (roles && roles.length > 0) {
       next();
     } else {
+      console.log('no roles');
       try {
         await userStore.getUserInfo();
 
@@ -43,6 +44,7 @@ router.beforeEach(async (to, from, next) => {
           next(`/`);
         }
       } catch (error) {
+        console.log(error);
         MessagePlugin.error(error);
         next(`/login?redirect=${to.path}`);
         NProgress.done();

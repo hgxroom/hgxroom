@@ -42,10 +42,14 @@
             </div>
             <div class="detail-list__content">
               <t-steps layout="vertical" theme="dot" :current="procedureActive" readonly>
-                <t-step-item v-for="item in procedureList" :key="item.id" :title="item.sequenceNumber" />
+                <t-step-item
+                  v-for="item in procedureList"
+                  :key="item.id + item.createTime"
+                  :title="item.sequenceNumber"
+                />
               </t-steps>
               <t-steps class="no-line" layout="vertical" theme="dot" :current="procedureActive" readonly>
-                <t-step-item v-for="item in procedureList" :key="item.id" :title="item.createTime" />
+                <t-step-item v-for="item in procedureList" :key="item.id + item.createTime" :title="item.createTime" />
               </t-steps>
             </div>
           </div>
@@ -82,12 +86,12 @@ function getProcessInfo(pId) {
     procedureId: pId,
   };
   getBoardListInfo(data).then((res) => {
-    procedureList.value = res.data;
     res.data.forEach((item, index) => {
-      if (item.flag === 1) {
+      if (item && item.flag === 1) {
         procedureActive.value = index;
       }
     });
+    procedureList.value = res.data;
   });
 }
 
@@ -101,7 +105,7 @@ function clickProcess(id, index) {
     item.active = false;
   });
   setpList.value[index].active = true;
-  activeProcess.value = setpList.value[index].procedureName;
+  activeProcess.value = setpList.value[index].station;
   getProcessInfo(id);
 }
 

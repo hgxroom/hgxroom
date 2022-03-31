@@ -145,6 +145,7 @@ const columns = ref([
   {
     colKey: 'index',
     title: '序号',
+    width: '80',
   },
   {
     colKey: 'station',
@@ -262,7 +263,7 @@ onMounted(() => {
     columns.value.push({
       colKey: 'operation',
       title: '操作',
-      width: 200,
+      width: '200',
     });
   }
   getSection();

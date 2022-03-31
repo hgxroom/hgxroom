@@ -24,7 +24,7 @@ const defaultRouterList: Array<RouteRecordRaw> = [
   },
   {
     path: '/',
-    redirect: '/dashboard/base',
+    redirect: '/production', // TODO：默认地址待处理
     component: () => import('@/layouts/blank.vue'),
   },
   {
