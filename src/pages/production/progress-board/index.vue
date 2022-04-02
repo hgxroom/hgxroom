@@ -119,8 +119,10 @@ function getProcessList(id) {
 
       res.data.details.forEach((item) => {
         item.rate *= 100;
+        item.rate = parseInt(item.rate, 10);
       });
       res.data.rate *= 100;
+      res.data.rate = parseInt(res.data.rate, 10);
 
       setpList.value = res.data.details;
       allRate.value = res.data.rate;
@@ -352,13 +354,19 @@ onMounted(() => {
 .t-steps-item {
   height: 50px;
   flex: 0 0 50px;
+  margin-bottom: 5px !important;
 }
+.t-steps--dot-anchor {
+  :deep(.t-steps-item__title) {
+    margin-top: 4px;
+  }
+}
+
 .no-line {
   :deep(.t-steps-item__icon) {
     border-color: transparent !important;
     background-color: transparent !important;
   }
-
   .t-steps-item:not(:last-child)::before {
     border-color: transparent !important;
     background: transparent !important;

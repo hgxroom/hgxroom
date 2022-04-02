@@ -27,8 +27,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { MessagePlugin } from 'tdesign-vue-next';
 import { DesktopIcon, LockOnIcon } from 'tdesign-icons-vue-next';
+import { showMessage } from '@/utils/notice';
 import { useUserStore } from '@/store';
 
 const userStore = useUserStore();
@@ -53,7 +53,7 @@ const onSubmit = async ({ validateResult }) => {
   }
   try {
     await userStore.login(formData.value);
-    MessagePlugin.success('登录成功');
+    showMessage('登录成功', 'success');
     router.push({ path: '/data' });
   } catch (error) {
     // console.log(error, 'error');

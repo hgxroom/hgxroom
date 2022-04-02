@@ -128,8 +128,8 @@
             :load="load"
           />
         </t-form-item>
-        <t-form-item label="工率" name="power">
-          <t-select v-model="formData.power" placeholder="请选择工率" class="demo-select-base" clearable>
+        <t-form-item label="功率" name="power">
+          <t-select v-model="formData.power" placeholder="请选择功率" class="demo-select-base" clearable>
             <t-option v-for="item in [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]" :key="item" :value="item">
               {{ item }}
             </t-option>
@@ -152,7 +152,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { MessagePlugin } from 'tdesign-vue-next';
+import { showMessage } from '@/utils/notice';
 import { deviceInfoListGet, deviceInfoListDel, deviceInfoListAddOrUpdate } from '@/api/base/device-info';
 import { selectProcessGet } from '@/api/base/process';
 import { selectDeviceTypeGet } from '@/api/base/devic-type';
@@ -208,46 +208,57 @@ const columns = ref([
     colKey: 'index',
     title: '序号',
     width: '80',
+    fixed: 'left',
   },
   {
     colKey: 'deviceNumber',
     title: '设备号',
+    width: '120',
   },
   {
     colKey: 'deviceType',
     title: '设备类型',
+    width: '120',
   },
   {
     colKey: 'deviceId',
     title: '设备ID',
+    width: '120',
   },
   {
     colKey: 'workshopName',
     title: '车间',
+    width: '120',
   },
   {
     colKey: 'tree',
-    title: '工序&工段',
+    title: '工段-工序',
+    width: '100',
   },
   {
     colKey: 'power',
     title: '功率',
+    width: '80',
   },
   {
     colKey: 'username',
     title: '创建人',
+    width: '140',
   },
   {
     colKey: 'createTime',
     title: '创建日期',
+    width: '190',
   },
   {
     colKey: 'updateTime',
     title: '更新日期',
+    width: '190',
   },
   {
     colKey: 'status',
     title: '状态',
+    width: '80',
   },
 ]);
 const DIALOG_TABLE = ref([]); // 弹出框数据
@@ -375,14 +386,14 @@ const onSubmit = (type) => {
   formData.value.id = type ? null : chooseRow.value.id;
   formRef.value.validate().then((res) => {
     if (res === true) {
-      deviceInfoListAddOrUpdate(formData.value).then((res) => {
+      deviceInfoListAddOrUpdate(formData.value).then(() => {
         if (type) {
-          MessagePlugin.success('新增成功');
+          showMessage('新增成功', 'success');
           if (type === 1) {
             onReset();
           }
         } else {
-          MessagePlugin.success('保存成功');
+          showMessage('保存成功', 'success');
           visible.value = false;
         }
         getList({ page: pagination.value.current, size: pagination.value.pageSize });
@@ -396,7 +407,7 @@ const handleClickDisable = (row) => {
   deviceInfoListAddOrUpdate({ id: row.id, status }).then(() => {
     row.status = status;
     getList({ page: pagination.value.current, size: pagination.value.pageSize });
-    MessagePlugin.success(message);
+    showMessage(message, 'success');
     row.disable = false;
   });
 };
@@ -407,7 +418,7 @@ const handleClickDelete = (row) => {
         data.value.splice(index, 1);
       }
     });
-    MessagePlugin.success('删除成功');
+    showMessage('删除成功', 'success');
     getList({ page: pagination.value.current, size: pagination.value.pageSize });
     row.visible = false;
   });
@@ -417,7 +428,8 @@ onMounted(() => {
     columns.value.push({
       colKey: 'operation',
       title: '操作',
-      width: 200,
+      width: '180',
+      fixed: 'right',
     });
   }
   selectDeviceTypeGet({ parentIds: [0], status: 0 }).then((res) => {
