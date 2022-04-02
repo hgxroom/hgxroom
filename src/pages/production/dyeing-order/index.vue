@@ -363,6 +363,7 @@ function setListFirstItemInfo() {
   getInfoProcess(firstItem.id).then((res) => {
     const { data } = res;
     data.rate *= 100;
+    data.rate = parseInt(data.rate, 10);
     data.details.forEach((item, index) => {
       if (index !== 0 && item.startTime) {
         const nowTime = dayjs(item.startTime, 'YYYY-MM-DD HH:mm:ss').unix();
@@ -471,6 +472,7 @@ function onClickRowDyeingList({ row, index }) {
   getInfoProcess(row.id).then((res) => {
     const { data } = res;
     data.rate *= 100;
+    data.rate = parseInt(data.rate, 10);
     data.details.forEach((item, index) => {
       if (index !== 0 && item.startTime) {
         const nowTime = dayjs(item.startTime, 'YYYY-MM-DD HH:mm:ss').unix();

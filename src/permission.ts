@@ -1,4 +1,3 @@
-import { MessagePlugin } from 'tdesign-vue-next';
 import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 
@@ -30,7 +29,6 @@ router.beforeEach(async (to, from, next) => {
     if (roles && roles.length > 0) {
       next();
     } else {
-      console.log('no roles');
       try {
         await userStore.getUserInfo();
 
@@ -45,7 +43,6 @@ router.beforeEach(async (to, from, next) => {
         }
       } catch (error) {
         console.log(error);
-        MessagePlugin.error(error);
         next(`/login?redirect=${to.path}`);
         NProgress.done();
       }

@@ -102,7 +102,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { MessagePlugin } from 'tdesign-vue-next';
+import { showMessage } from '@/utils/notice';
 import { workshopListGet, workshopListDel, workshopListAddOrUpdate } from '@/api/base/workshop';
 import { useUserStore } from '@/store';
 
@@ -147,30 +147,39 @@ const columns = ref([
     colKey: 'index',
     title: '序号',
     width: '80',
+    fixed: 'left',
   },
   {
     colKey: 'workshopNumber',
     title: '编号',
+    width: '150',
+    fixed: 'left',
   },
   {
     colKey: 'workshopName',
     title: '车间',
+    width: '150',
+    fixed: 'left',
   },
   {
     colKey: 'username',
     title: '创建人',
+    width: '140',
   },
   {
     colKey: 'createTime',
     title: '创建日期',
+    width: '190',
   },
   {
     colKey: 'updateTime',
     title: '更新日期',
+    width: '190',
   },
   {
     colKey: 'status',
     title: '状态',
+    width: '80',
   },
 ]);
 const visible = ref(false);
@@ -200,7 +209,6 @@ const getList = (obj: object) => {
     pagination.value.total = list.total;
     pagination.value.current = list.current;
     data.value = list.records;
-    console.log(data.value);
   });
 };
 const rehandleChange = (changeParams) => {
@@ -214,13 +222,13 @@ const onSubmit = (type) => {
     if (res === true) {
       workshopListAddOrUpdate(formData.value).then(() => {
         if (type) {
-          MessagePlugin.success('新增成功');
+          showMessage('新增成功', 'success');
           if (type === 1) {
             formData.value.workshopNumber = '';
             formData.value.workshopName = '';
           }
         } else {
-          MessagePlugin.success('保存成功');
+          showMessage('保存成功', 'success');
           visible.value = false;
         }
         getList({ page: pagination.value.current, size: pagination.value.pageSize });
@@ -234,7 +242,7 @@ const handleClickDisable = (row) => {
   workshopListAddOrUpdate({ id: row.id, status }).then(() => {
     row.status = status;
     getList({ page: pagination.value.current, size: pagination.value.pageSize });
-    MessagePlugin.success(message);
+    showMessage(message, 'success');
     row.disible = false;
   });
 };
@@ -245,7 +253,7 @@ const handleClickDelete = (row) => {
         data.value.splice(index, 1);
       }
     });
-    MessagePlugin.success('删除成功');
+    showMessage('删除成功', 'success');
     getList({ page: pagination.value.current, size: pagination.value.pageSize });
     row.visible = false;
   });
@@ -255,7 +263,8 @@ onMounted(() => {
     columns.value.push({
       colKey: 'operation',
       title: '操作',
-      width: 200,
+      width: '180',
+      fixed: 'right',
     });
   }
   getList({ page: pagination.value.current, size: pagination.value.pageSize });

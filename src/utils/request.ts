@@ -110,8 +110,9 @@ instance.interceptors.response.use(
     if (data.code === CODE.TOKEN_FAIL) {
       showMessage('登录状态失效，请重新登录', 'error');
       router.push({ path: '/login' });
+    } else {
+      showMessage(data.message, 'error');
     }
-    showMessage(data.message, 'error');
     return Promise.reject(response);
   },
   (error) => {
