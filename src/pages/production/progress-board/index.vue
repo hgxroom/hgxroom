@@ -41,15 +41,11 @@
               <div>开始时间</div>
             </div>
             <div class="detail-list__content">
-              <t-steps layout="vertical" theme="dot" :current="procedureActive" readonly>
-                <t-step-item
-                  v-for="item in procedureList"
-                  :key="item.id + item.createTime"
-                  :title="item.sequenceNumber"
-                />
+              <t-steps layout="vertical" :current="procedureActive" readonly>
+                <t-step-item v-for="item in procedureList" :key="item.uniId" :title="item.sequenceNumber" />
               </t-steps>
               <t-steps class="no-line" layout="vertical" theme="dot" :current="procedureActive" readonly>
-                <t-step-item v-for="item in procedureList" :key="item.id + item.createTime" :title="item.createTime" />
+                <t-step-item v-for="item in procedureList" :key="item.uniId" :title="item.createTime" />
               </t-steps>
             </div>
           </div>
@@ -64,6 +60,7 @@
 </template>
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';
+import _ from 'lodash';
 import { getAllVatCode, getBoardListInfo } from '@/api/production/progress-board';
 import { getInfoProcess } from '@/api/production/dyeing-order';
 
@@ -85,11 +82,14 @@ function getProcessInfo(pId) {
     orderId: activeId,
     procedureId: pId,
   };
+  procedureList.value = [];
+  procedureActive.value = 0;
   getBoardListInfo(data).then((res) => {
     res.data.forEach((item, index) => {
       if (item && item.flag === 1) {
         procedureActive.value = index;
       }
+      item.uniId = _.uniqueId();
     });
     procedureList.value = res.data;
   });
@@ -309,6 +309,7 @@ onMounted(() => {
         font-size: 14px;
         flex: 0 0 200px;
       }
+
       :deep(.t-steps-item__content) {
         padding-left: 40px;
       }
