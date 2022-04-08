@@ -296,8 +296,8 @@ onMounted(() => {
       color: #242424;
       line-height: 22px;
       & > div:first-child {
-        margin-left: 56px;
-        margin-right: 154px;
+        margin-left: 72px;
+        margin-right: 144px;
       }
     }
     &__content {
