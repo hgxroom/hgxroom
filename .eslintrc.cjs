@@ -81,7 +81,7 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/prefer-default-export': 0, // 当只有有个模块导出时，使用默认导出而不是用命名导出
-
+    'import/first': 'off', // https://github.com/vuejs/vue-eslint-parser/issues/58
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'vue/first-attribute-linebreak': 0,
