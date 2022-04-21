@@ -469,25 +469,32 @@ function onClickRowDyeingList({ row, index }) {
     }
   });
   baseInfo.value = row;
-  getInfoProcess(row.id).then((res) => {
-    const { data } = res;
-    data.rate *= 100;
-    data.rate = parseInt(data.rate, 10);
-    data.details.forEach((item, index) => {
-      if (index !== 0 && item.startTime) {
-        const nowTime = dayjs(item.startTime, 'YYYY-MM-DD HH:mm:ss').unix();
-        // 如果上一条数据不存在，直接跳出
-        if (!data.details[index - 1].startTime) {
-          return;
-        }
-        const preTime = dayjs(data.details[index - 1].startTime, 'YYYY-MM-DD HH:mm:ss').unix();
-        let useTime = (nowTime - preTime) / 60;
-        useTime = useTime < 0 ? 0 : useTime;
-        data.details[index - 1].useTime = useTime.toFixed(0);
+  getInfoProcess(row.id)
+    .then((res) => {
+      const { data } = res;
+      if (!data) {
+        Object.assign(detailProcessInfo, PROCESS_INFO);
       }
+      data.rate *= 100;
+      data.rate = parseInt(data.rate, 10);
+      data.details.forEach((item, index) => {
+        if (index !== 0 && item.startTime) {
+          const nowTime = dayjs(item.startTime, 'YYYY-MM-DD HH:mm:ss').unix();
+          // 如果上一条数据不存在，直接跳出
+          if (!data.details[index - 1].startTime) {
+            return;
+          }
+          const preTime = dayjs(data.details[index - 1].startTime, 'YYYY-MM-DD HH:mm:ss').unix();
+          let useTime = (nowTime - preTime) / 60;
+          useTime = useTime < 0 ? 0 : useTime;
+          data.details[index - 1].useTime = useTime.toFixed(0);
+        }
+      });
+      Object.assign(detailProcessInfo, data);
+    })
+    .catch(() => {
+      Object.assign(detailProcessInfo, PROCESS_INFO);
     });
-    Object.assign(detailProcessInfo, data);
-  });
   getFabricsList(row.id).then((res) => {
     bpData.value = res.data;
   });
