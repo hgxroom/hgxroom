@@ -133,7 +133,6 @@ export const SALE_COLUMNS: TdBaseTableProps['columns'] = [
     ellipsis: true,
     colKey: 'productName',
     title: '客户名称',
-    minWidth: 200,
   },
   {
     align: 'center',
@@ -175,7 +174,6 @@ export const BUY_COLUMNS: TdBaseTableProps['columns'] = [
     ellipsis: true,
     colKey: 'productName',
     title: '供应商名称',
-    minWidth: 200,
   },
   {
     align: 'center',
