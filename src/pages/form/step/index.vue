@@ -2,14 +2,14 @@
   <div>
     <div class="form-step-container">
       <!-- 简单步骤条 -->
-      <card title="基本信息">
+      <t-card :bordered="false">
         <t-steps class="step-container" :current="activeForm" status="process">
           <t-step-item title="提交开票申请" />
           <t-step-item title="填写发票信息" />
           <t-step-item title="确认邮寄地址" />
           <t-step-item title="完成" />
         </t-steps>
-      </card>
+      </t-card>
 
       <!-- 分步表单1 -->
       <div v-show="activeForm === 0" class="rule-tips">
@@ -139,11 +139,17 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: 'FormStep',
+};
+</script>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ValidateResultContext } from 'tdesign-vue-next';
-import Card from '@/components/card/Block.vue';
 
 import {
   FORM_RULES,
@@ -186,6 +192,7 @@ const complete = () => {
   router.replace({ path: '/detail/advanced' });
 };
 </script>
+
 <style lang="less" scoped>
 @import url('./index.less');
 </style>

@@ -6,11 +6,11 @@
           Hi，Image
           <span class="regular"> 下午好，今天是你加入鹅厂的第 100 天～</span>
         </div>
-        <img src="@/assets/logo-text.png" class="logo" />
+        <!-- <img src="@/assets/assets-tencent-logo.png" class="logo" /> -->
       </div>
 
-      <card class="user-info-list" size="small" title="个人信息">
-        <template #option>
+      <t-card class="user-info-list" title="个人信息">
+        <template #actions>
           <t-button theme="default" shape="square" variant="text">
             <t-icon name="edit" size="18" />
           </t-button>
@@ -25,16 +25,16 @@
             </div>
           </t-col>
         </t-row>
-      </card>
+      </t-card>
 
-      <card class="content-container">
+      <t-card class="content-container">
         <t-tabs value="second">
           <t-tab-panel value="first" label="内容列表">
             <p>内容列表</p>
           </t-tab-panel>
           <t-tab-panel value="second" label="内容列表">
-            <card class="card-padding-no" title="主页访问数据" describe="（次）">
-              <template #option>
+            <t-card :bordered="false" class="card-padding-no" title="主页访问数据" describe="（次）">
+              <template #actions>
                 <t-date-picker
                   class="card-date-picker-container"
                   :default-value="LAST_7_DAYS"
@@ -45,24 +45,24 @@
                 />
               </template>
               <div id="lineContainer" style="width: 100%; height: 330px" />
-            </card>
+            </t-card>
           </t-tab-panel>
           <t-tab-panel value="third" label="内容列表">
             <p>内容列表</p>
           </t-tab-panel>
         </t-tabs>
-      </card>
+      </t-card>
     </t-col>
 
     <t-col :flex="1">
-      <card class="user-intro">
+      <t-card class="user-intro">
         <t-avatar size="90px">T</t-avatar>
         <div class="name">My Account</div>
         <div class="position">XXG 港澳业务拓展组员工 直客销售</div>
-      </card>
+      </t-card>
 
-      <card title="团队成员" class="user-team" size="small">
-        <template #option>
+      <t-card title="团队成员" class="user-team">
+        <template #actions>
           <t-button theme="default" shape="square" variant="text">
             <t-icon name="edit" size="18" />
           </t-button>
@@ -72,10 +72,10 @@
             <t-list-item-meta :image="item.avatar" :title="item.title" :description="item.description" />
           </t-list-item>
         </t-list>
-      </card>
+      </t-card>
 
-      <card title="服务产品" class="product-container" size="small">
-        <template #option>
+      <t-card title="服务产品" class="product-container">
+        <template #actions>
           <t-button theme="default" shape="square" variant="text">
             <t-icon name="edit" size="18" />
           </t-button>
@@ -85,10 +85,15 @@
             <component :is="getIcon(item)"></component>
           </t-col>
         </t-row>
-      </card>
+      </t-card>
     </t-col>
   </t-row>
 </template>
+<script lang="ts">
+export default {
+  name: 'UserIndex',
+};
+</script>
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, watch, computed } from 'vue';
 import * as echarts from 'echarts/core';
@@ -99,13 +104,12 @@ import { useSettingStore } from '@/store';
 
 import { LAST_7_DAYS } from '@/utils/date';
 import { USER_INFO_LIST, TEAM_MEMBERS, PRODUCT_LIST } from './constants';
-import { changeChartsTheme, getFolderLineDataSet } from '@/pages/dashboard/base/index';
+import { getFolderLineDataSet } from './index';
 import ProductAIcon from '@/assets/icons/assets-product-1.svg';
 import ProductBIcon from '@/assets/icons/assets-product-2.svg';
 import ProductCIcon from '@/assets/icons/assets-product-3.svg';
 import ProductDIcon from '@/assets/icons/assets-product-4.svg';
-
-import Card from '@/components/card/Block.vue';
+import { changeChartsTheme } from '@/utils/color';
 
 echarts.use([GridComponent, TooltipComponent, LineChart, CanvasRenderer, LegendComponent]);
 
@@ -172,6 +176,7 @@ watch(
   },
 );
 </script>
+
 <style lang="less" scoped>
 @import url('./index.less');
 </style>

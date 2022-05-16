@@ -2,11 +2,13 @@
   <div>
     <div class="list-card-operation">
       <t-button @click="formDialogVisible = true"> 新建产品 </t-button>
-      <t-input v-model="searchValue" class="search-input" placeholder="请输入你需要搜索的内容" clearable>
-        <template #suffix-icon>
-          <search-icon v-if="searchValue === ''" size="20px" />
-        </template>
-      </t-input>
+      <div class="search-input">
+        <t-input v-model="searchValue" placeholder="请输入你需要搜索的内容" clearable>
+          <template #suffix-icon>
+            <search-icon v-if="searchValue === ''" size="20px" />
+          </template>
+        </t-input>
+      </div>
     </div>
 
     <dialog-form v-model:visible="formDialogVisible" :data="formData" />
@@ -24,7 +26,7 @@
             :xs="6"
             :xl="3"
           >
-            <card
+            <product-card
               class="list-card-item"
               :product="product"
               @delete-item="handleDeleteItem"
@@ -58,11 +60,18 @@
     />
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: 'ListCard',
+};
+</script>
+
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { SearchIcon } from 'tdesign-icons-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
-import Card from '@/components/card/Card.vue';
+import ProductCard from '@/components/product-card/index.vue';
 import DialogForm from './components/DialogForm.vue';
 import request from '@/utils/request';
 import { ResDataType } from '@/interface';
@@ -139,6 +148,7 @@ const handleManageProduct = (product) => {
   formData.value = { ...product, status: product?.isSetup ? '1' : '0' };
 };
 </script>
+
 <style lang="less" scoped>
 @import '@/style/variables.less';
 

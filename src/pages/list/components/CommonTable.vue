@@ -3,7 +3,7 @@
     <t-form ref="form" :data="formData" :label-width="80" colon @reset="onReset" @submit="onSubmit">
       <t-row>
         <t-col :span="10">
-          <t-row :gutter="[16, 16]">
+          <t-row :gutter="[16]">
             <t-col :flex="1">
               <t-form-item label="合同名称" name="name">
                 <t-input
@@ -64,6 +64,8 @@
         :hover="hover"
         :pagination="pagination"
         :loading="dataLoading"
+        :header-affixed-top="true"
+        :header-affix-props="{ offsetTop, container: getContainer }"
         @page-change="rehandlePageChange"
         @change="rehandleChange"
       >
@@ -108,6 +110,7 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import Trend from '@/components/trend/index.vue';
 import request from '@/utils/request';
 import { ResDataType } from '@/interface';
+import { useSettingStore } from '@/store';
 
 import {
   CONTRACT_STATUS,
@@ -117,11 +120,14 @@ import {
   CONTRACT_PAYMENT_TYPES,
 } from '@/constants';
 
+const store = useSettingStore();
+
 const COLUMNS = [
   {
     title: '合同名称',
     fixed: 'left',
-    minWidth: '300',
+    width: 200,
+    ellipsis: true,
     align: 'left',
     colKey: 'name',
   },
@@ -248,6 +254,14 @@ const rehandleChange = (changeParams, triggerAndData) => {
 };
 const rehandleClickOp = ({ text, row }) => {
   console.log(text, row);
+};
+
+const offsetTop = computed(() => {
+  return store.isUseTabsRouter ? 48 : 0;
+});
+
+const getContainer = () => {
+  return document.querySelector('.tdesign-starter-layout');
 };
 </script>
 
