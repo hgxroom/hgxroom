@@ -1,20 +1,21 @@
 <template>
   <div>
-    <card class="list-card-container">
+    <t-card class="list-card-container">
       <t-row justify="space-between">
         <div class="left-operation-container">
           <t-button @click="handleSetupContract"> 新建合同 </t-button>
           <t-button variant="base" theme="default" :disabled="!selectedRowKeys.length"> 导出合同 </t-button>
           <p v-if="!!selectedRowKeys.length" class="selected-count">已选{{ selectedRowKeys.length }}项</p>
-          <svg-icon name="documentation" width="20"></svg-icon>
         </div>
-        <t-input v-model="searchValue" class="search-input" placeholder="请输入你需要搜索的内容" clearable>
-          <template #suffix-icon>
-            <search-icon size="20px" />
-          </template>
-        </t-input>
+        <div class="search-input">
+          <t-input v-model="searchValue" placeholder="请输入你需要搜索的内容" clearable>
+            <template #suffix-icon>
+              <search-icon size="20px" />
+            </template>
+          </t-input>
+        </div>
       </t-row>
-
+      <!-- 如果开启多标签tab页 请修改offsetTop的配置 -->
       <t-table
         :data="data"
         :columns="COLUMNS"
@@ -24,6 +25,8 @@
         :pagination="pagination"
         :selected-row-keys="selectedRowKeys"
         :loading="dataLoading"
+        :header-affixed-top="true"
+        :header-affix-props="{ offsetTop, container: getContainer }"
         @page-change="rehandlePageChange"
         @change="rehandleChange"
         @select-change="rehandleSelectChange"
@@ -54,7 +57,7 @@
           <a class="t-button-link" @click="handleClickDelete(slotProps)">删除</a>
         </template>
       </t-table>
-    </card>
+    </t-card>
 
     <t-dialog
       v-model:visible="confirmVisible"
@@ -65,6 +68,13 @@
     />
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: 'ListBase',
+};
+</script>
+
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -73,13 +83,13 @@ import { MessagePlugin } from 'tdesign-vue-next';
 
 import { CONTRACT_STATUS, CONTRACT_TYPES, CONTRACT_PAYMENT_TYPES } from '@/constants';
 import Trend from '@/components/trend/index.vue';
-import Card from '@/components/card/Block.vue';
 import { ResDataType } from '@/interface';
 import request from '@/utils/request';
+import { useSettingStore } from '@/store';
 
 import { COLUMNS } from './constants';
 
-import SvgIcon from '@/components/svg-icon/index.vue';
+const store = useSettingStore();
 
 const data = ref([]);
 const pagination = ref({
@@ -171,7 +181,16 @@ const handleClickDelete = (row: { rowIndex: any }) => {
   deleteIdx.value = row.rowIndex;
   confirmVisible.value = true;
 };
+
+const offsetTop = computed(() => {
+  return store.isUseTabsRouter ? 48 : 0;
+});
+
+const getContainer = () => {
+  return document.querySelector('.tdesign-starter-layout');
+};
 </script>
+
 <style lang="less" scoped>
 @import '@/style/variables';
 

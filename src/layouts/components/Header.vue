@@ -3,7 +3,7 @@
     <t-head-menu :class="menuCls" :theme="theme" expand-type="popup" :value="active">
       <template #logo>
         <span v-if="showLogo" class="header-logo-container" @click="handleNav('/dashboard/base')">
-          <tLogoFull class="t-logo" />
+          <LogoFull class="t-logo" />
         </span>
         <div v-else class="header-operate-left">
           <t-button theme="default" shape="square" variant="text" @click="changeCollapsed">
@@ -65,10 +65,11 @@
 
 <script setup lang="ts">
 import { PropType, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
+import { getActive } from '@/router';
 import { useSettingStore, useUserStore } from '@/store';
 import { prefix } from '@/config/global';
-import tLogoFull from '@/assets/assets-logo-full.svg?component';
+import LogoFull from '@/assets/assets-logo-full.svg?component';
 import { MenuRoute } from '@/interface';
 
 import Notice from './Notice.vue';
@@ -118,17 +119,7 @@ const toggleSettingPanel = () => {
   });
 };
 
-const active = computed(() => {
-  const route = useRoute();
-  if (!route.path) {
-    return '';
-  }
-  return route.path
-    .split('/')
-    .filter((item, index) => index <= props.maxLevel && index > 0)
-    .map((item) => `/${item}`)
-    .join('');
-});
+const active = computed(() => getActive());
 
 const layoutCls = computed(() => [`${prefix}-header-layout`]);
 
@@ -176,7 +167,7 @@ const navToHelper = () => {
   &-menu-fixed {
     position: fixed;
     top: 0;
-    z-index: 10;
+    z-index: 1001;
 
     &-side {
       left: 232px;
@@ -184,7 +175,6 @@ const navToHelper = () => {
       z-index: 10;
       width: auto;
       transition: all 0.3s;
-
       &-compact {
         left: 64px;
       }
@@ -200,6 +190,11 @@ const navToHelper = () => {
 .header-menu {
   flex: 1 1 1;
   display: inline-flex;
+
+  .t-menu__item {
+    min-width: unset;
+    padding: 0px 16px;
+  }
 }
 
 .operations-container {
