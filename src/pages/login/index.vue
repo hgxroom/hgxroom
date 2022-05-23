@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import Login from './components/Login.vue';
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .login-wrapper {
   height: 100vh;
   background: url('@/assets/bg/login__background.webp') no-repeat center/cover;

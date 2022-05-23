@@ -157,7 +157,7 @@ const navToHelper = () => {
   window.open('http://tdesign.tencent.com/starter/docs/get-started');
 };
 </script>
-<style lang="less">
+<style lang="less" scoped>
 @import '@/style/variables.less';
 .@{prefix}-header {
   &-layout {
@@ -191,7 +191,7 @@ const navToHelper = () => {
   flex: 1 1 1;
   display: inline-flex;
 
-  .t-menu__item {
+  :deep(.t-menu__item) {
     min-width: unset;
     padding: 0px 16px;
   }
@@ -264,7 +264,7 @@ const navToHelper = () => {
   }
 }
 
-.t-head-menu__inner {
+:deep(.t-head-menu__inner) {
   border-bottom: 1px solid @border-level-1-color;
 }
 
@@ -297,7 +297,7 @@ const navToHelper = () => {
     margin-right: 8px;
   }
 
-  .t-dropdown__item {
+  :deep(.t-dropdown__item) {
     .t-dropdown__item__content {
       display: flex;
       justify-content: center;
@@ -309,12 +309,12 @@ const navToHelper = () => {
     }
   }
 
-  .t-dropdown__item {
+  :deep(.t-dropdown__item) {
     width: 100%;
     margin-bottom: 0px;
   }
   &:last-child {
-    .t-dropdown__item {
+    :deep(.t-dropdown__item) {
       margin-bottom: 8px;
     }
   }
