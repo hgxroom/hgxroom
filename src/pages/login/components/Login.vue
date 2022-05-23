@@ -60,7 +60,7 @@ const onSubmit = async ({ validateResult }) => {
   }
 };
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .login__form {
   background: #fff;
   width: 400px;
