@@ -13,3 +13,4 @@ temp*
 static/
 !.prettierrc.js
 .eslintrc.*
+vite.config.ts

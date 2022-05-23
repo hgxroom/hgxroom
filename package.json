@@ -2,8 +2,9 @@
   "name": "slt-erp",
   "version": "0.1.1",
   "scripts": {
-    "dev:mock": "vite --open --mode mock",
     "dev": "vite --open --mode development",
+    "dev:force": "vite --force --open --mode development",
+    "dev:mock": "vite --open --mode mock",
     "dev:linux": "vite --mode development",
     "build:dev": "vite build --mode development",
     "build:test": "vite build --mode test",

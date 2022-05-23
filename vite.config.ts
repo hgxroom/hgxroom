@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => {
       legacy({
         targets: ['ie >= 11'],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+        polyfills: ['es.array.iterator'],
       }),
       viteMockServe({
         mockPath: 'mock',
@@ -62,6 +63,30 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       include: ['qrcode.vue'],
+    },
+    build: {
+      chunkSizeWarningLimit: 700,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // id 即是路径
+            if (id.includes('node_modules')) {
+              const packagePath = id.toString().split('node_modules/')[1];
+              const packageName = packagePath.split('/')[0].toString();
+
+              switch (packageName) {
+                case 'echarts':
+                case 'zrender':
+                case 'lodash':
+                case 'tdesign-vue-next':
+                  return `_${packageName}`;
+                default:
+                  return '_vendor';
+              }
+            }
+          },
+        },
+      },
     },
   };
 });
