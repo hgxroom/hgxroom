@@ -73,16 +73,11 @@ export default defineConfig(({ mode }) => {
             if (id.includes('node_modules')) {
               const packagePath = id.toString().split('node_modules/')[1];
               const packageName = packagePath.split('/')[0].toString();
-
-              switch (packageName) {
-                case 'echarts':
-                case 'zrender':
-                case 'lodash':
-                case 'tdesign-vue-next':
-                  return `_${packageName}`;
-                default:
-                  return '_vendor';
+              const bigPackages = ['echarts', 'zrender', 'lodash', 'xlsx'];
+              if (bigPackages.includes(packageName)) {
+                return `_${packageName}`;
               }
+              return '_vendor';
             }
           },
         },
