@@ -20,6 +20,13 @@ export default {
     // 测试环境 cdn 路径
     cdn: '',
   },
+  staging: {
+    // 预生产环境接口地址
+    host: 'http://39.104.13.107:7600',
+    socket: 'ws://39.104.13.107:7600',
+    // 预生产环境 cdn 路径
+    cdn: '',
+  },
   release: {
     // 正式环境接口地址
     host: 'http://digital.knit-easy.com',
