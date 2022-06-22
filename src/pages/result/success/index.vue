@@ -9,7 +9,11 @@
     </div>
   </div>
 </template>
-
+<script lang="ts">
+export default {
+  name: 'ResultSuccess',
+};
+</script>
 <style lang="less" scoped>
 @import '@/style/variables.less';
 
@@ -22,13 +26,13 @@
 
   &-icon {
     font-size: 64px;
-    color: @success-color;
+    color: var(--tdvns-success-color);
   }
 
   &-title {
     margin-top: 16px;
     font-size: 20px;
-    color: @text-color-primary;
+    color: var(--tdvns-text-color-primary);
     text-align: center;
     line-height: 22px;
     font-weight: 500;
@@ -37,7 +41,7 @@
   &-describe {
     margin: 8px 0 32px;
     font-size: 14px;
-    color: @text-color-primary;
+    color: var(--tdvns-text-color-primary);
     line-height: 22px;
   }
 }

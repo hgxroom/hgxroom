@@ -1,9 +1,17 @@
 <template>
   <div class="list-common-table">
-    <t-form ref="form" :data="formData" :label-width="80" colon @reset="onReset" @submit="onSubmit">
+    <t-form
+      ref="form"
+      :data="formData"
+      :label-width="80"
+      colon
+      :style="{ marginBottom: '8px' }"
+      @reset="onReset"
+      @submit="onSubmit"
+    >
       <t-row>
         <t-col :span="10">
-          <t-row :gutter="[16]">
+          <t-row :gutter="[16, 24]">
             <t-col :flex="1">
               <t-form-item label="合同名称" name="name">
                 <t-input
@@ -268,9 +276,9 @@ const getContainer = () => {
 <style lang="less" scoped>
 @import '@/style/variables.less';
 .list-common-table {
-  background-color: @bg-color-container;
+  background-color: var(--tdvns-bg-color-container);
   padding: 30px 32px;
-  border-radius: @border-radius;
+  border-radius: var(--tdvns-border-radius);
 
   .table-container {
     margin-top: 30px;
