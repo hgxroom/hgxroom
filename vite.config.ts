@@ -25,9 +25,8 @@ export default defineConfig(({ mode }) => {
       vue(),
       vueJsx(),
       legacy({
-        targets: ['ie >= 11'],
+        targets: ['chrome >= 49', 'ie >= 11'],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-        polyfills: ['es.array.iterator'],
       }),
       viteMockServe({
         mockPath: 'mock',
