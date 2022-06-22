@@ -95,6 +95,7 @@ export default defineComponent({
       () => route.path,
       () => {
         appendNewRoute();
+        document.querySelector(`.${prefix}-layout`).scrollTo({ top: 0, behavior: 'smooth' });
       },
     );
 
@@ -169,7 +170,8 @@ export default defineComponent({
       const { showBreadcrumb, showFooter, isUseTabsRouter } = settingStore;
       const { tabRouters } = tabsRouterStore;
       return (
-        <t-layout class={[`${prefix}-layout`]} key={route.name}>
+        // <t-layout class={[`${prefix}-layout`]} key={route.name}> 如果存在多个滚动列表之间切换时，页面不刷新导致的样式问题 请设置key 但会导致多标签tab页的缓存失效
+        <t-layout class={[`${prefix}-layout`]}>
           {isUseTabsRouter && (
             <t-tabs
               theme="card"

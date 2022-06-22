@@ -15,6 +15,13 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: 'ListTree',
+};
+</script>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { SearchIcon } from 'tdesign-icons-vue-next';
@@ -34,11 +41,12 @@ const onInput = () => {
   };
 };
 </script>
+
 <style lang="less" scoped>
 @import '@/style/variables.less';
 .table-tree-container {
-  background-color: @bg-color-container;
-  border-radius: @border-radius;
+  background-color: var(--tdvns-bg-color-container);
+  border-radius: var(--tdvns-border-radius);
 
   .t-tree {
     margin-top: 24px;
@@ -56,7 +64,7 @@ const onInput = () => {
 }
 
 .list-tree-content {
-  border-left: 1px solid @border-level-1-color;
+  border-left: 1px solid var(--tdvns-border-level-1-color);
   overflow: auto;
 }
 </style>

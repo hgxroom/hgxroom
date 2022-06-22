@@ -15,7 +15,7 @@
         <!-- 表单内容 -->
 
         <!-- 合同名称,合同类型 -->
-        <t-row class="row-gap" :gutter="[16, 0]">
+        <t-row class="row-gap" :gutter="[16, 24]">
           <t-col :span="6">
             <t-form-item label="合同名称" name="name">
               <t-input v-model="formData.name" :style="{ width: '322px' }" placeholder="请输入内容" />
@@ -45,7 +45,9 @@
                 <t-radio value="2"> 付款 </t-radio>
               </t-radio-group>
               <span class="space-item" />
-              <t-input placeholder="请输入金额" :style="{ width: '160px' }" />
+              <div>
+                <t-input placeholder="请输入金额" :style="{ width: '160px' }" />
+              </div>
             </t-form-item>
           </t-col>
 
@@ -154,6 +156,13 @@
     </div>
   </t-form>
 </template>
+
+<script lang="ts">
+export default {
+  name: 'FormBase',
+};
+</script>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
@@ -188,6 +197,7 @@ const formatResponse = (res) => {
   return { ...res, error: '上传失败，请重试', url: res.url };
 };
 </script>
+
 <style lang="less" scoped>
 @import url('./index.less');
 </style>

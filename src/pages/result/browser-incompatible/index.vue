@@ -18,11 +18,16 @@
     </div>
   </result>
 </template>
-
+<script lang="ts">
+export default {
+  name: 'ResultBrowserIncompatible',
+};
+</script>
 <script setup lang="ts">
 import Result from '@/components/result/index.vue';
 import Thumbnail from '@/components/thumbnail/index.vue';
 </script>
+
 <style lang="less" scoped>
 @import '@/style/variables.less';
 
@@ -32,7 +37,7 @@ import Thumbnail from '@/components/thumbnail/index.vue';
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  color: @text-color-secondary;
+  color: var(--tdvns-text-color-secondary);
 }
 
 .recommend-container {
@@ -43,8 +48,8 @@ import Thumbnail from '@/components/thumbnail/index.vue';
   top: 175px;
   padding: 24px 48px;
   width: 640px;
-  background: @bg-color-container;
-  box-shadow: 0px 1px 2px @shadow-1;
+  background: var(--tdvns-bg-color-container);
+  box-shadow: 0px 1px 2px var(--tdvns-shadow-1);
   border-radius: 3px;
 }
 

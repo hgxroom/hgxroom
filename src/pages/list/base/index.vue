@@ -15,7 +15,6 @@
           </t-input>
         </div>
       </t-row>
-      <!-- 如果开启多标签tab页 请修改offsetTop的配置 -->
       <t-table
         :data="data"
         :columns="COLUMNS"
@@ -211,7 +210,7 @@ const getContainer = () => {
   .selected-count {
     display: inline-block;
     margin-left: 8px;
-    color: @text-color-secondary;
+    color: var(--tdvns-text-color-secondary);
   }
 }
 
