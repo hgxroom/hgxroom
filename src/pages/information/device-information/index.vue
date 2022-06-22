@@ -151,7 +151,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import { showMessage } from '@/utils/notice';
 import { deviceInfoListGet, deviceInfoListDel, deviceInfoListAddOrUpdate } from '@/api/base/device-info';
 import { selectProcessGet } from '@/api/base/process';
@@ -423,7 +423,8 @@ const handleClickDelete = (row) => {
     row.visible = false;
   });
 };
-onMounted(() => {
+onBeforeMount(() => {
+  // 挂载之前调整，不然会报错
   if (roleId === 1) {
     columns.value.push({
       colKey: 'operation',
@@ -432,6 +433,8 @@ onMounted(() => {
       fixed: 'right',
     });
   }
+});
+onMounted(() => {
   selectDeviceTypeGet({ parentIds: [0], status: 0 }).then((res) => {
     TYPE_DEVICE.value = res.data;
   });

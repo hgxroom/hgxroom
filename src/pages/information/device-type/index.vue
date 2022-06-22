@@ -102,7 +102,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import { showMessage } from '@/utils/notice';
 import { deviceTypeListGet, deviceTypeListDel, deviceTypeListAddOrUpdate } from '@/api/base/devic-type';
 import { useUserStore } from '@/store';
@@ -243,7 +243,8 @@ const handleClickDelete = (row) => {
     row.visible = false;
   });
 };
-onMounted(() => {
+onBeforeMount(() => {
+  // 挂载之前调整，不然会报错
   if (roleId === 1) {
     columns.value.push({
       colKey: 'operation',
@@ -252,6 +253,8 @@ onMounted(() => {
       fixed: 'right',
     });
   }
+});
+onMounted(() => {
   getList({ page: pagination.value.current, size: pagination.value.pageSize });
 });
 </script>
