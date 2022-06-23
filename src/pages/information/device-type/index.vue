@@ -9,7 +9,7 @@
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
         <t-table
-          row-key="index"
+          row-key="id"
           :data="data"
           :columns="columns"
           @row-click="handleRowClick"
