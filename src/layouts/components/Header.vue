@@ -70,9 +70,9 @@ import { getActive } from '@/router';
 import { useSettingStore, useUserStore } from '@/store';
 import { prefix } from '@/config/global';
 import LogoFull from '@/assets/assets-logo-full.svg?component';
-import { MenuRoute } from '@/interface';
+import { MenuRoute } from '@/types/interface';
 
-import Notice from './Notice.vue';
+// import Notice from './Notice.vue';
 import Search from './Search.vue';
 import MenuContent from './MenuContent';
 
@@ -113,11 +113,11 @@ const props = defineProps({
 const router = useRouter();
 const settingStore = useSettingStore();
 
-const toggleSettingPanel = () => {
-  settingStore.updateConfig({
-    showSettingPanel: true,
-  });
-};
+// const toggleSettingPanel = () => {
+//   settingStore.updateConfig({
+//     showSettingPanel: true,
+//   });
+// };
 
 const active = computed(() => getActive());
 
@@ -149,13 +149,13 @@ const handleLogout = () => {
   router.push(`/login?redirect=${router.currentRoute.value.fullPath}`);
 };
 
-const navToGitHub = () => {
-  window.open('https://github.com/tencent/tdesign-vue-next-starter');
-};
+// const navToGitHub = () => {
+//   window.open('https://github.com/tencent/tdesign-vue-next-starter');
+// };
 
-const navToHelper = () => {
-  window.open('http://tdesign.tencent.com/starter/docs/get-started');
-};
+// const navToHelper = () => {
+//   window.open('http://tdesign.tencent.com/starter/docs/get-started');
+// };
 </script>
 <style lang="less" scoped>
 @import '@/style/variables.less';

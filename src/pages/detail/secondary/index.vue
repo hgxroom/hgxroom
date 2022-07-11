@@ -49,11 +49,18 @@
     />
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  name: 'DetailSecondary',
+};
+</script>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { NOTIFICATION_TYPES } from '@/constants';
-import { NotificationItem } from '@/interface';
+import { NotificationItem } from '@/types/interface';
 import EmptyIcon from '@/assets/icons/assets-empty.svg?component';
 import { useNotificationStore } from '@/store';
 
@@ -114,6 +121,7 @@ const deleteMsg = () => {
   store.setMsgData(changeMsg);
 };
 </script>
+
 <style lang="less" scoped>
 @import url('./index.less');
 </style>

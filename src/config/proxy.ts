@@ -1,4 +1,5 @@
 export default {
+  isRequestProxy: true,
   development: {
     // 开发环境接口请求
     // host: 'http://192.168.1.81:7600',

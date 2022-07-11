@@ -3,6 +3,7 @@ import 'virtual:svg-icons-register';
 
 import { createApp } from 'vue';
 import TDesign from 'tdesign-vue-next';
+import '@csstools/normalize.css/opinionated.css';
 import 'tdesign-vue-next/es/style/index.css';
 
 import { store } from './store';
