@@ -141,7 +141,7 @@ export default defineComponent({
               ),
             operations: () => (
               <span class="version-container">
-                {!this.collapsed && '数联通'} {pgk.version}
+                {!this.collapsed && '一鹿通'} {pgk.version}
               </span>
             ),
           }}
