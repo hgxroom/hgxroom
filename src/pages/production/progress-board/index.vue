@@ -184,8 +184,10 @@ onMounted(() => {
 </script>
 <style lang="less" scoped>
 .app-container {
-  background-color: #fff;
   display: flex;
+  // 顶部栏64,margin24+24
+  height: calc(100vh - 64px - 48px);
+  overflow: hidden;
 }
 .progress-list {
   width: 220px;
@@ -199,7 +201,7 @@ onMounted(() => {
     line-height: 25px;
   }
   &__content {
-    height: 840px;
+    height: calc(100% - 55px);
     overflow-y: auto;
     &::-webkit-scrollbar {
       width: 12px;
@@ -297,17 +299,18 @@ onMounted(() => {
       line-height: 22px;
       & > div:first-child {
         margin-left: 72px;
-        margin-right: 144px;
+        margin-right: 172px;
       }
     }
     &__content {
       display: flex;
       height: 400px;
       overflow-y: auto;
+      overflow-x: hidden;
       :deep(.t-steps) {
-        width: 200px;
+        width: 230px;
         font-size: 14px;
-        flex: 0 0 200px;
+        flex: 0 0 230px;
       }
 
       :deep(.t-steps-item__content) {

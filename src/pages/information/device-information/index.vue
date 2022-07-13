@@ -1,92 +1,88 @@
 <!-- 资料-设备 -->
 <template>
-  <div class="dyeing-order">
-    <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title">
+  <div class="app-container table-page">
+    <div class="table-page-top">
+      <div class="table-page-top__title">
         <t-button theme="primary" @click="handleClick({})" v-if="roleId === 1">新增</t-button>
       </div>
     </div>
-    <div class="dyeing-order-content">
-      <div class="dyeing-order-content__list">
-        <t-table
-          row-key="id"
-          :data="data"
-          :columns="columns"
-          @row-click="handleRowClick"
-          :pagination="pagination"
-          @change="rehandleChange"
+    <t-table
+      row-key="id"
+      :data="data"
+      :columns="columns"
+      @row-click="handleRowClick"
+      :pagination="pagination"
+      @change="rehandleChange"
+    >
+      <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
+      <template #deviceType="{ row }">
+        <span v-if="TYPE_DEVICE.findIndex((item) => item.id === row.deviceType) >= 0" class="span--normal">
+          {{ TYPE_DEVICE[TYPE_DEVICE.findIndex((item) => item.id === row.deviceType)].deviceTypeName }}
+        </span>
+        <span v-else>类型不存在</span>
+      </template>
+      <template #status="{ row }">
+        <span v-show="row.status === 0" class="span--normal">正常</span>
+        <span v-show="row.status === -1" class="span--disable">禁用</span>
+      </template>
+      <template #tree="{ row }">
+        <span v-for="item in row.tree" :key="item.id">
+          <a v-if="item.child" class="t-button-link" @click="ondialog(item.child)">
+            <t-tooltip :content="item.content"> {{ item.name }}{{ item.child.length }}</t-tooltip>
+          </a>
+        </span>
+      </template>
+      <template #operation="{ row }">
+        <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
+        <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
+        <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
+        <t-popconfirm
+          v-else
+          class="t-button-link"
+          :visible="row.visible"
+          theme="default"
+          content="是否删除?"
+          @Cancel="
+            () => {
+              row.visible = false;
+            }
+          "
+          @Confirm="handleClickDelete(row)"
         >
-          <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
-          <template #deviceType="{ row }">
-            <span v-if="TYPE_DEVICE.findIndex((item) => item.id === row.deviceType) >= 0" class="span--normal">
-              {{ TYPE_DEVICE[TYPE_DEVICE.findIndex((item) => item.id === row.deviceType)].deviceTypeName }}
-            </span>
-            <span v-else>类型不存在</span>
-          </template>
-          <template #status="{ row }">
-            <span v-show="row.status === 0" class="span--normal">正常</span>
-            <span v-show="row.status === -1" class="span--disable">禁用</span>
-          </template>
-          <template #tree="{ row }">
-            <span v-for="item in row.tree" :key="item.id">
-              <a v-if="item.child" class="t-button-link" @click="ondialog(item.child)">
-                <t-tooltip :content="item.content"> {{ item.name }}{{ item.child.length }}</t-tooltip>
-              </a>
-            </span>
-          </template>
-          <template #operation="{ row }">
-            <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
-            <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
-            <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
-            <t-popconfirm
-              v-else
-              class="t-button-link"
-              :visible="row.visible"
-              theme="default"
-              content="是否删除?"
-              @Cancel="
-                () => {
-                  row.visible = false;
-                }
-              "
-              @Confirm="handleClickDelete(row)"
-            >
-              <a
-                @click="
-                  () => {
-                    row.visible = true;
-                  }
-                "
-                >删除</a
-              >
-            </t-popconfirm>
-            <a v-if="row.status === -1" class="t-button-link" @click="handleClickDisable(row)">启用</a>
-            <t-popconfirm
-              v-else
-              class="t-button-link"
-              :visible="row.disible"
-              theme="default"
-              content="是否禁用?"
-              @Cancel="
-                () => {
-                  row.disible = false;
-                }
-              "
-              @Confirm="handleClickDisable(row)"
-            >
-              <a
-                @click="
-                  () => {
-                    row.disible = true;
-                  }
-                "
-                >禁用</a
-              >
-            </t-popconfirm>
-          </template>
-        </t-table>
-      </div>
-    </div>
+          <a
+            @click="
+              () => {
+                row.visible = true;
+              }
+            "
+            >删除</a
+          >
+        </t-popconfirm>
+        <a v-if="row.status === -1" class="t-button-link" @click="handleClickDisable(row)">启用</a>
+        <t-popconfirm
+          v-else
+          class="t-button-link"
+          :visible="row.disible"
+          theme="default"
+          content="是否禁用?"
+          @Cancel="
+            () => {
+              row.disible = false;
+            }
+          "
+          @Confirm="handleClickDisable(row)"
+        >
+          <a
+            @click="
+              () => {
+                row.disible = true;
+              }
+            "
+            >禁用</a
+          >
+        </t-popconfirm>
+      </template>
+    </t-table>
     <t-drawer
       v-model:visible="visible"
       size="480px"
@@ -385,20 +381,21 @@ const onSubmit = (type) => {
   // type 保存状态 0：保存 1保存并新增 2保存并复制
   formData.value.id = type ? null : chooseRow.value.id;
   formRef.value.validate().then((res) => {
-    if (res === true) {
-      deviceInfoListAddOrUpdate(formData.value).then(() => {
-        if (type) {
-          showMessage('新增成功', 'success');
-          if (type === 1) {
-            onReset();
-          }
-        } else {
-          showMessage('保存成功', 'success');
-          visible.value = false;
-        }
-        getList({ page: pagination.value.current, size: pagination.value.pageSize });
-      });
+    if (res !== true) {
+      return;
     }
+    deviceInfoListAddOrUpdate(formData.value).then(() => {
+      if (type) {
+        showMessage('新增成功', 'success');
+        if (type === 1) {
+          onReset();
+        }
+      } else {
+        showMessage('保存成功', 'success');
+        visible.value = false;
+      }
+      getList({ page: pagination.value.current, size: pagination.value.pageSize });
+    });
   });
 };
 const handleClickDisable = (row) => {
@@ -446,28 +443,6 @@ onMounted(() => {
 });
 </script>
 <style lang="less" scoped>
-.dyeing-order {
-  background-color: #fff;
-  padding: 10px 20px;
-  &-top {
-    height: 41px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    &__title {
-      font-size: 18px;
-      font-family: PingFangSC-Medium, PingFang SC;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.9);
-      line-height: 25px;
-    }
-    &__btn-group {
-      & > .t-button {
-        margin-left: 16px;
-      }
-    }
-  }
-}
 .span--normal {
   color: #00a870;
 }

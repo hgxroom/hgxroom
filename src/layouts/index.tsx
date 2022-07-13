@@ -5,7 +5,7 @@ import { usePermissionStore, useSettingStore, useTabsRouterStore } from '@/store
 
 import LayoutHeader from './components/Header.vue';
 import LayoutBreadcrumb from './components/Breadcrumb.vue';
-import LayoutFooter from './components/Footer.vue';
+// import LayoutFooter from './components/Footer.vue';
 import LayoutSideNav from './components/SideNav';
 import LayoutContent from './components/Content.vue';
 import Setting from './setting.vue';
@@ -159,11 +159,12 @@ export default defineComponent({
     };
 
     const renderFooter = () => {
-      return (
-        <t-footer class={`${prefix}-footer-layout`}>
-          <LayoutFooter />
-        </t-footer>
-      );
+      /* 目前不需要页脚 */
+      // return (
+      //   <t-footer class={`${prefix}-footer-layout`}>
+      //     <LayoutFooter />
+      //   </t-footer>
+      // );
     };
 
     const renderContent = () => {
