@@ -14,7 +14,6 @@ import { useTabsRouterStore } from '@/store';
 const aliveViews = computed(() => {
   const tabsRouterStore = useTabsRouterStore();
   const { tabRouters } = tabsRouterStore;
-  console.log(tabRouters);
   return tabRouters.filter((route) => route.isAlive).map((route) => route.name);
 }) as ComputedRef<string[]>;
 

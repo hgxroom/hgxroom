@@ -39,8 +39,8 @@ const INITIAL_DATA = {
 };
 
 const FORM_RULES = {
-  username: [],
-  password: [],
+  username: [{ required: true, message: '用户名必填', type: 'error' }],
+  password: [{ required: true, message: '密码必填', type: 'error' }],
 };
 
 const formData = ref({ ...INITIAL_DATA });
@@ -56,7 +56,7 @@ const onSubmit = async ({ validateResult }) => {
     showMessage('登录成功', 'success');
     router.push({ path: '/data' });
   } catch (error) {
-    // console.log(error, 'error');
+    console.log(error, 'login_page');
   }
 };
 </script>

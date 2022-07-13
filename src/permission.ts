@@ -42,7 +42,7 @@ router.beforeEach(async (to, from, next) => {
           next(`/`);
         }
       } catch (error) {
-        console.log(error);
+        console.log('permission', error);
         next(`/login?redirect=${to.path}`);
         NProgress.done();
       }
