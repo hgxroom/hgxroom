@@ -35,27 +35,21 @@ export const useUserStore = defineStore('user', {
       // const mockRemoteUserInfo = async (token: string) => {
       //   if (token === 'main_token') {
       //     return {
-      //       name: 'user_main',
+      //       name: 'td_main',
       //       roles: ['all'],
       //     };
       //   }
       //   return {
-      //     name: 'user_dev',
-      //     roles: [
-      //       'login',
-      //       '404Page',
-      //       'Process',
-      //       'Workshop',
-      //       'EquipmentType',
-      //       'EquipmentInformation',
-      //       'OrderList',
-      //       'ProgressBoard',
-      //     ],
+      //     name: 'td_dev',
+      //     roles: ['UserIndex', 'DashboardBase', 'login'],
       //   };
       // };
 
-      const res = await getInfo();
+      // const res = await mockRemoteUserInfo(this.token);
 
+      // this.userInfo = res;
+
+      const res = await getInfo();
       res.data.roles = [
         'login',
         '404Page',

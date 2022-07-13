@@ -46,6 +46,10 @@ const columns = [
     fixed: 'left',
   },
   {
+    colKey: 'rfid',
+    title: 'rfid',
+  },
+  {
     colKey: 'deviceName',
     title: '工序',
   },
