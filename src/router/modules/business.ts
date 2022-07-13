@@ -43,9 +43,15 @@ export default [
     children: [
       {
         path: 'order-list',
-        name: 'Orderlist',
+        name: 'OrderList',
         component: () => import('@/pages/production/dyeing-order/index.vue'),
         meta: { title: '染色订单' },
+      },
+      {
+        path: 'work-sequence',
+        name: 'WorkSequence',
+        component: () => import('@/pages/production/work-sequence/index.vue'),
+        meta: { title: '工序看板' },
       },
       {
         path: 'progress-board',

@@ -48,7 +48,7 @@ export const useUserStore = defineStore('user', {
       //       'Workshop',
       //       'EquipmentType',
       //       'EquipmentInformation',
-      //       'Orderlist',
+      //       'OrderList',
       //       'ProgressBoard',
       //     ],
       //   };
@@ -63,7 +63,9 @@ export const useUserStore = defineStore('user', {
         'Workshop',
         'EquipmentType',
         'EquipmentInformation',
-        'Orderlist',
+        'OrderList',
+        'EmbryosStorage',
+        'WorkSequence',
         'ProgressBoard',
       ];
       this.userInfo = res.data;

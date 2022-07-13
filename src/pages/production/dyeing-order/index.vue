@@ -3,7 +3,7 @@
     <div class="dyeing-order-top">
       <div class="dyeing-order-top__title">订单列表</div>
       <div class="dyeing-order-top__btn-group">
-        <!-- TODO:设置字段待做  @计智谋-->
+        <!-- TODO:设置字段待做  @lanka-->
         <!-- <t-button variant="outline" theme="default" @click="visibleColumnSetModal = true">设置字段</t-button> -->
         <template v-if="roleId === 1">
           <t-button theme="primary" @click="clickBpBtn">备胚</t-button>
@@ -15,8 +15,8 @@
     <div class="dyeing-order-content">
       <div class="dyeing-order-content__list">
         <div class="dyeing-order-content__list-filter">
-          <t-select v-model="searchListState" :options="listStateOptions" @change="listStateChange" />
-          <t-select v-model="searchType" :options="searchTypeOptions"></t-select>
+          <t-select v-model="searchListState" :options="listStateOptions" @change="listStateChange" autoWidth />
+          <t-select v-model="searchType" :options="searchTypeOptions" autoWidth></t-select>
           <div class="search-btn-group">
             <t-input v-model="searchContent" placeholder="请输入查询内容" />
             <t-button shape="square" variant="outline" @click="getDyeingOrderList">
@@ -41,7 +41,7 @@
       </div>
 
       <div class="dyeing-order-content__detail">
-        <TitleHeader title="基本信息" />
+        <title-header title="基本信息" />
         <div class="detail-form">
           <t-form layout="inline" labelWidth="64px" :data="baseInfo">
             <t-form-item label="缸号">

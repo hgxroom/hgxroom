@@ -1,79 +1,75 @@
 <!-- 资料-工序页面 -->
 <template>
-  <div class="dyeing-order">
-    <div class="dyeing-order-top">
-      <div class="dyeing-order-top__title">
+  <div class="app-container table-page">
+    <div class="table-page-top">
+      <div class="table-page-top__title">
         <t-button theme="primary" @click="handleClick({})" v-if="roleId === 1">新增</t-button>
       </div>
     </div>
-    <div class="dyeing-order-content">
-      <div class="dyeing-order-content__list">
-        <t-table
-          row-key="id"
-          :data="data"
-          :columns="columns"
-          @row-click="handleRowClick"
-          :pagination="pagination"
-          @change="rehandleChange"
+    <t-table
+      row-key="id"
+      :data="data"
+      :columns="columns"
+      @row-click="handleRowClick"
+      :pagination="pagination"
+      @change="rehandleChange"
+    >
+      <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
+      <template #status="{ row }">
+        <span v-show="row.status === 0" class="span--normal">正常</span>
+        <span v-show="row.status === -1" class="span--disable">禁用</span>
+      </template>
+      <template #operation="{ row }">
+        <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
+        <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
+        <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
+        <t-popconfirm
+          v-else
+          class="t-button-link"
+          :visible="row.visible"
+          theme="default"
+          content="是否删除?"
+          @Cancel="
+            () => {
+              row.visible = false;
+            }
+          "
+          @Confirm="handleClickDelete(row)"
         >
-          <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
-          <template #status="{ row }">
-            <span v-show="row.status === 0" class="span--normal">正常</span>
-            <span v-show="row.status === -1" class="span--disable">禁用</span>
-          </template>
-          <template #operation="{ row }">
-            <a v-if="row.status === -1" class="t-button-link disabled">编辑</a>
-            <a v-else class="t-button-link" @click="handleClick(row)">编辑</a>
-            <a v-if="row.status === -1" class="t-button-link disabled">删除</a>
-            <t-popconfirm
-              v-else
-              class="t-button-link"
-              :visible="row.visible"
-              theme="default"
-              content="是否删除?"
-              @Cancel="
-                () => {
-                  row.visible = false;
-                }
-              "
-              @Confirm="handleClickDelete(row)"
-            >
-              <a
-                @click="
-                  () => {
-                    row.visible = true;
-                  }
-                "
-                >删除</a
-              >
-            </t-popconfirm>
-            <a v-if="row.status === -1" class="t-button-link" @click="handleClickDisable(row)">启用</a>
-            <t-popconfirm
-              v-else
-              class="t-button-link"
-              :visible="row.disible"
-              theme="default"
-              content="是否禁用?"
-              @Cancel="
-                () => {
-                  row.disible = false;
-                }
-              "
-              @Confirm="handleClickDisable(row)"
-            >
-              <a
-                @click="
-                  () => {
-                    row.disible = true;
-                  }
-                "
-                >禁用</a
-              >
-            </t-popconfirm>
-          </template>
-        </t-table>
-      </div>
-    </div>
+          <a
+            @click="
+              () => {
+                row.visible = true;
+              }
+            "
+            >删除</a
+          >
+        </t-popconfirm>
+        <a v-if="row.status === -1" class="t-button-link" @click="handleClickDisable(row)">启用</a>
+        <t-popconfirm
+          v-else
+          class="t-button-link"
+          :visible="row.disible"
+          theme="default"
+          content="是否禁用?"
+          @Cancel="
+            () => {
+              row.disible = false;
+            }
+          "
+          @Confirm="handleClickDisable(row)"
+        >
+          <a
+            @click="
+              () => {
+                row.disible = true;
+              }
+            "
+            >禁用</a
+          >
+        </t-popconfirm>
+      </template>
+    </t-table>
     <t-drawer
       v-model:visible="visible"
       size="480px"
@@ -228,7 +224,7 @@ const onSubmit = (type) => {
   formData.value.id = type ? null : chooseRow.value.id;
   formRef.value.validate().then((res) => {
     if (res === true) {
-      processListAddOrUpdate(formData.value).then((res) => {
+      processListAddOrUpdate(formData.value).then(() => {
         if (type) {
           showMessage('新增成功', 'success');
           if (type === 1) {
@@ -284,28 +280,6 @@ onMounted(() => {
 });
 </script>
 <style lang="less" scoped>
-.dyeing-order {
-  background-color: #fff;
-  padding: 10px 20px;
-  &-top {
-    height: 41px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    &__title {
-      font-size: 18px;
-      font-family: PingFangSC-Medium, PingFang SC;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.9);
-      line-height: 25px;
-    }
-    &__btn-group {
-      & > .t-button {
-        margin-left: 16px;
-      }
-    }
-  }
-}
 a.disabled {
   pointer-events: none;
   filter: alpha(opacity=50); /*IE滤镜，透明度50%*/

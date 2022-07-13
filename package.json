@@ -88,8 +88,7 @@
       "eslint --fix"
     ],
     "*.{html,vue,vss,sass,less}": [
-      "npm run stylelint:fix",
-      "git add ."
+      "npm run stylelint:fix"
     ]
   }
 }
