@@ -42,7 +42,7 @@ const pagination: Ref<paginationType> = ref({
 const columns = [
   {
     colKey: 'id',
-    title: 'ID',
+    title: '序号',
     fixed: 'left',
   },
   {

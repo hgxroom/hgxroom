@@ -1,6 +1,6 @@
 {
   "name": "slt-erp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "scripts": {
     "dev": "vite --open --mode development",
     "dev:force": "vite --force --open --mode development",
