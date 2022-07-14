@@ -1,9 +1,10 @@
 import request from '@/utils/request';
 
-export function getAllVatCode() {
+export function getAllVatCode(data = { page: 1, size: 30 }) {
   return request({
     url: '/xiyou-digital-server/order/board/getAllNow',
     method: 'POST',
+    data,
   });
 }
 

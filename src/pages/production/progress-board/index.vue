@@ -14,6 +14,17 @@
           {{ item.vatCode }}
         </div>
       </div>
+      <t-pagination
+        class="pagination-left"
+        size="small"
+        theme="simple"
+        :show-page-size="false"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        :total="pagination.total"
+        @current-change="onCurrentChange"
+      >
+      </t-pagination>
     </div>
     <!-- 缸号详情 -->
     <div class="progress-info">
@@ -66,6 +77,12 @@ import { getInfoProcess } from '@/api/production/dyeing-order';
 
 import TitleHeader from '../components/TitleHeader.vue';
 
+const pagination = ref({
+  pageSize: 30,
+  total: 0,
+  current: 1,
+});
+
 const orderList = ref([]);
 // 工序环形图
 const setpList = ref([]);
@@ -74,6 +91,32 @@ const allRate = ref(0);
 const procedureList = ref([]);
 const procedureActive = ref(0); // 下标0开始
 const activeProcess = ref('');
+
+/** 获取左侧缸号列表 */
+function getVatList(data) {
+  getAllVatCode(data).then((res) => {
+    const { data } = res;
+    if (data.total === 0) {
+      return;
+    }
+    data.records.forEach((item) => {
+      item.active = false;
+    });
+    data.records[0].active = true;
+    orderList.value = data.records;
+    pagination.value = {
+      ...pagination.value,
+      total: data.total,
+      current: data.current,
+    };
+    getProcessList(data.records[0].id);
+  });
+}
+
+function onCurrentChange(index, pageInfo) {
+  const data = { page: index, size: pageInfo.pageSize };
+  getVatList(data);
+}
 
 /** 获取工序的具体详情 */
 function getProcessInfo(pId) {
@@ -131,21 +174,6 @@ function getProcessList(id) {
       clickProcess(setpList.value[0].procedureId, 0);
     });
 }
-/** 获取左侧缸号列表 */
-function getVatList() {
-  getAllVatCode().then((res) => {
-    const { data } = res;
-    if (data.length === 0) {
-      return;
-    }
-    data.forEach((item) => {
-      item.active = false;
-    });
-    data[0].active = true;
-    orderList.value = data;
-    getProcessList(data[0].id);
-  });
-}
 
 function clickOrderNum(index: number) {
   if (orderList.value[index].active) {
@@ -179,7 +207,7 @@ const processBg = computed(() => {
 });
 
 onMounted(() => {
-  getVatList();
+  getVatList({ page: pagination.value.current, size: pagination.value.pageSize });
 });
 </script>
 <style lang="less" scoped>
@@ -188,6 +216,9 @@ onMounted(() => {
   // 顶部栏64,margin24+24
   height: calc(100vh - 64px - 48px);
   overflow: hidden;
+}
+.pagination-left {
+  margin-left: 5px;
 }
 .progress-list {
   width: 220px;
@@ -201,7 +232,7 @@ onMounted(() => {
     line-height: 25px;
   }
   &__content {
-    height: calc(100% - 55px);
+    height: calc(100% - 85px);
     overflow-y: auto;
     &::-webkit-scrollbar {
       width: 12px;

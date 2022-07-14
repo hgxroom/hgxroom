@@ -100,14 +100,14 @@
           <t-input v-model="formData.deviceId" clearable />
         </t-form-item>
         <t-form-item label="设备类型" name="deviceType">
-          <t-select v-model="formData.deviceType" placeholder="请选择设备类型" class="demo-select-base" clearable>
+          <t-select v-model="formData.deviceType" placeholder="请选择设备类型" clearable>
             <t-option v-for="item in TYPE_DEVICE" :key="item.id" :value="item.id" :label="item.deviceTypeName">
               {{ item.deviceTypeName }}
             </t-option>
           </t-select>
         </t-form-item>
         <t-form-item label="车间" name="workshopId">
-          <t-select v-model="formData.workshopId" placeholder="请选择车间" class="demo-select-base" clearable>
+          <t-select v-model="formData.workshopId" placeholder="请选择车间" clearable>
             <t-option v-for="item in TYPE_WORKSHOP" :key="item.id" :value="item.id" :label="item.workshopName">
               {{ item.workshopName }}
             </t-option>
@@ -125,9 +125,8 @@
           />
         </t-form-item>
         <t-form-item label="功率" name="power">
-          <t-select v-model="formData.power" placeholder="请选择功率" class="demo-select-base" clearable>
-            <t-option v-for="item in [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]" :key="item" :value="item">
-              {{ item }}
+          <t-select v-model="formData.power" placeholder="请选择功率" clearable>
+            <t-option v-for="item in [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]" :key="item" :value="item" :label="`${item}`">
             </t-option>
           </t-select>
         </t-form-item>
