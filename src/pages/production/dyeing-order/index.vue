@@ -442,6 +442,7 @@ const bpColumns = [
     align: 'center',
     colKey: 'rfid',
     title: 'RFid',
+    width: '180',
   },
   {
     colKey: 'fabricNumber',
