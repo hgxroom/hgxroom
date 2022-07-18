@@ -229,6 +229,7 @@ type dyeingPaginationType = {
   total?: number;
   size?: string;
   theme?: string;
+  pageSizeOptions?: object[];
 };
 
 const dyeingPagination: Ref<dyeingPaginationType> = ref({
@@ -237,6 +238,12 @@ const dyeingPagination: Ref<dyeingPaginationType> = ref({
   total: 0,
   size: 'small',
   theme: 'simple',
+  pageSizeOptions: [
+    { label: '10条/页', value: 10 },
+    { label: '20条/页', value: 20 },
+    { label: '50条/页', value: 50 },
+    { label: '100条/页', value: 100 },
+  ],
 });
 
 const dyeingOrderList = ref([]);
