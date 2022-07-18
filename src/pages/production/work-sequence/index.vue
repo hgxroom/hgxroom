@@ -48,9 +48,14 @@ const columns = [
   {
     colKey: 'rfid',
     title: 'rfid',
+    className: 'monospace',
   },
   {
     colKey: 'deviceName',
+    title: '设备',
+  },
+  {
+    colKey: 'processName',
     title: '工序',
   },
   {
