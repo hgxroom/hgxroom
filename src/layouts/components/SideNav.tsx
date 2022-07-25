@@ -131,13 +131,13 @@ export default defineComponent({
           v-slots={{
             logo: () =>
               this.showLogo && (
-                <span class={`${prefix}-side-nav-logo-wrapper`} onClick={this.goHome}>
+                <div class={`${prefix}-side-nav-logo-wrapper`} onClick={this.goHome}>
                   {this.collapsed ? (
                     <img class={`${prefix}-side-nav-logo-wrapper`} src={logo} />
                   ) : (
-                    <img class={`${prefix}-side-nav-logo-tdesign-logo`} src={logoText}></img>
+                    <img class={`${prefix}-side-nav-logo-text-logo`} src={logoText}></img>
                   )}
-                </span>
+                </div>
               ),
             operations: () => (
               <span class="version-container">
