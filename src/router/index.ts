@@ -1,4 +1,6 @@
-import { useRoute, createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+import { useRoute, createRouter, createWebHashHistory } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
+import uniq from 'lodash/uniq';
 
 import baseRouters from './modules/base';
 import componentsRouters from './modules/components';
@@ -37,6 +39,25 @@ const defaultRouterList: Array<RouteRecordRaw> = [
 ];
 
 export const allRoutes = [...defaultRouterList, ...asyncRouterList];
+
+export const getRoutesExpanded = () => {
+  const expandedRoutes = [];
+
+  allRoutes.forEach((item) => {
+    if (item.meta && item.meta.expanded) {
+      expandedRoutes.push(item.path);
+    }
+    if (item.children && item.children.length > 0) {
+      item.children
+        .filter((child) => child.meta && child.meta.expanded)
+        .forEach((child: RouteRecordRaw) => {
+          expandedRoutes.push(item.path);
+          expandedRoutes.push(`${item.path}/${child.path}`);
+        });
+    }
+  });
+  return uniq(expandedRoutes);
+};
 
 export const getActive = (maxLevel = 3): string => {
   const route = useRoute();

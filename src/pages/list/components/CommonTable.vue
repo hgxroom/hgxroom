@@ -73,8 +73,7 @@
         :hover="hover"
         :pagination="pagination"
         :loading="dataLoading"
-        :header-affixed-top="true"
-        :header-affix-props="{ offsetTop, container: getContainer }"
+        :header-affixed-top="{ offsetTop, container: getContainer }"
         @page-change="rehandlePageChange"
         @change="rehandleChange"
       >
@@ -94,7 +93,7 @@
           <p v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.PAYMENT" class="payment-col">
             付款<trend class="dashboard-item-trend" type="up" />
           </p>
-          <p v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.RECIPT" class="payment-col">
+          <p v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.RECEIPT" class="payment-col">
             收款<trend class="dashboard-item-trend" type="down" />
           </p>
         </template>
@@ -120,6 +119,7 @@ import Trend from '@/components/trend/index.vue';
 import request from '@/utils/request';
 import { ResDataType } from '@/types/interface';
 import { useSettingStore } from '@/store';
+import { prefix } from '@/config/global';
 
 import {
   CONTRACT_STATUS,
@@ -270,16 +270,16 @@ const offsetTop = computed(() => {
 });
 
 const getContainer = () => {
-  return document.querySelector('.tdesign-starter-layout');
+  return document.querySelector(`.${prefix}-layout`);
 };
 </script>
 
 <style lang="less" scoped>
 @import '@/style/variables.less';
 .list-common-table {
-  background-color: var(--tdvns-bg-color-container);
+  background-color: var(--td-bg-color-container);
   padding: 30px 32px;
-  border-radius: var(--tdvns-border-radius);
+  border-radius: @border-radius;
 
   .table-container {
     margin-top: 30px;

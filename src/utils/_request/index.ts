@@ -1,8 +1,9 @@
 // axios配置  可自行根据项目进行更改，只需更改该文件即可，其他文件可以不动
-import _ from 'lodash';
-import proxy from '@/config/proxy';
+import isString from 'lodash/isString';
+import merge from 'lodash/merge';
 import type { AxiosTransform, CreateAxiosOptions } from './AxiosTransform';
-import { Axios } from './Axios';
+import { VAxios } from './Axios';
+import proxy from '@/config/proxy';
 import { joinTimestamp, formatRequestDate, setObjToUrlParams } from './utils';
 import { TOKEN_NAME } from '@/config/global';
 
@@ -39,16 +40,16 @@ const transform: AxiosTransform = {
       throw new Error('请求接口错误');
     }
 
-    //  这里 message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    const { message } = data;
+    //  这里 code为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
+    const { code } = data;
 
     // 这里逻辑可以根据项目进行修改
-    const hasSuccess = data && !Reflect.has(data, 'error');
+    const hasSuccess = data && code === 0;
     if (hasSuccess) {
-      return data;
+      return data.data;
     }
 
-    throw new Error(message);
+    throw new Error(`请求接口错误, 错误码: ${code}`);
   },
 
   // 请求前处理配置
@@ -61,17 +62,17 @@ const transform: AxiosTransform = {
     }
 
     // 将baseUrl拼接
-    if (apiUrl && _.isString(apiUrl)) {
+    if (apiUrl && isString(apiUrl)) {
       config.url = `${apiUrl}${config.url}`;
     }
     const params = config.params || {};
     const data = config.data || false;
 
-    if (formatDate && data && !_.isString(data)) {
+    if (formatDate && data && !isString(data)) {
       formatRequestDate(data);
     }
     if (config.method?.toUpperCase() === 'GET') {
-      if (!_.isString(params)) {
+      if (!isString(params)) {
         // 给 get 请求加上时间戳参数，避免从缓存中拿数据。
         config.params = Object.assign(params || {}, joinTimestamp(joinTime, false));
       } else {
@@ -79,7 +80,7 @@ const transform: AxiosTransform = {
         config.url = `${config.url + params}${joinTimestamp(joinTime, true)}`;
         config.params = undefined;
       }
-    } else if (!_.isString(params)) {
+    } else if (!isString(params)) {
       if (formatDate) {
         formatRequestDate(params);
       }
@@ -92,7 +93,7 @@ const transform: AxiosTransform = {
         config.params = undefined;
       }
       if (joinParamsToUrl) {
-        config.url = setObjToUrlParams(config.url, { ...config.params, ...config.data });
+        config.url = setObjToUrlParams(config.url as string, { ...config.params, ...config.data });
       }
     } else {
       // 兼容restful风格
@@ -142,8 +143,8 @@ const transform: AxiosTransform = {
 };
 
 function createAxios(opt?: Partial<CreateAxiosOptions>) {
-  return new Axios(
-    _.merge(
+  return new VAxios(
+    merge(
       <CreateAxiosOptions>{
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#authentication_schemes
         // 例如: authenticationScheme: 'Bearer'
@@ -161,7 +162,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 接口地址
           apiUrl: host,
           // 是否自动添加接口前缀
-          isJoinPrefix: false,
+          isJoinPrefix: true,
           // 接口前缀
           // 例如: https://www.baidu.com/api
           // urlPrefix: '/api'
@@ -191,5 +192,4 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
     ),
   );
 }
-
 export const request = createAxios();

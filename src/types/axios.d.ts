@@ -22,6 +22,7 @@ export interface Result<T = any> {
   type: 'success' | 'error' | 'warning';
   message: string;
   result: T;
+  data: T;
 }
 
 export interface AxiosRequestConfigRetry extends AxiosRequestConfig {
