@@ -1,12 +1,13 @@
 import axios, { AxiosRequestConfig, AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { stringify } from 'qs';
-import _ from 'lodash';
+import isFunction from 'lodash/isFunction';
+import cloneDeep from 'lodash/cloneDeep';
 import { CreateAxiosOptions } from './AxiosTransform';
 import { AxiosCanceler } from './AxiosCancel';
 import { AxiosRequestConfigRetry, RequestOptions, Result } from '@/types/axios';
 
 // Axios模块
-export class Axios {
+export class VAxios {
   // axios句柄
   private instance: AxiosInstance;
 
@@ -69,28 +70,28 @@ export class Axios {
       const ignoreRepeat = ignoreRepeatRequest ?? this.options.requestOptions?.ignoreRepeatRequest;
       if (!ignoreRepeat) axiosCanceler.addPending(config);
 
-      if (requestInterceptors && _.isFunction(requestInterceptors)) {
+      if (requestInterceptors && isFunction(requestInterceptors)) {
         config = requestInterceptors(config, this.options);
       }
       return config;
     }, undefined);
 
     // 请求错误处理
-    if (requestInterceptorsCatch && _.isFunction(requestInterceptorsCatch)) {
+    if (requestInterceptorsCatch && isFunction(requestInterceptorsCatch)) {
       this.instance.interceptors.request.use(undefined, requestInterceptorsCatch);
     }
 
     // 响应结果处理
     this.instance.interceptors.response.use((res: AxiosResponse) => {
       if (res) axiosCanceler.removePending(res.config);
-      if (responseInterceptors && _.isFunction(responseInterceptors)) {
+      if (responseInterceptors && isFunction(responseInterceptors)) {
         res = responseInterceptors(res);
       }
       return res;
     }, undefined);
 
     // 响应错误处理
-    if (responseInterceptorsCatch && _.isFunction(responseInterceptorsCatch)) {
+    if (responseInterceptorsCatch && isFunction(responseInterceptorsCatch)) {
       this.instance.interceptors.response.use(undefined, responseInterceptorsCatch);
     }
   }
@@ -136,7 +137,7 @@ export class Axios {
 
   // 请求
   async request<T = any>(config: AxiosRequestConfigRetry, options?: RequestOptions): Promise<T> {
-    let conf: CreateAxiosOptions = _.cloneDeep(config);
+    let conf: CreateAxiosOptions = cloneDeep(config);
     const transform = this.getTransform();
 
     const { requestOptions } = this.options;
@@ -144,7 +145,7 @@ export class Axios {
     const opt: RequestOptions = { ...requestOptions, ...options };
 
     const { beforeRequestHook, requestCatchHook, transformRequestHook } = transform || {};
-    if (beforeRequestHook && _.isFunction(beforeRequestHook)) {
+    if (beforeRequestHook && isFunction(beforeRequestHook)) {
       conf = beforeRequestHook(conf, opt);
     }
     conf.requestOptions = opt;
@@ -155,7 +156,7 @@ export class Axios {
       this.instance
         .request<any, AxiosResponse<Result>>(!config.retryCount ? conf : config)
         .then((res: AxiosResponse<Result>) => {
-          if (transformRequestHook && _.isFunction(transformRequestHook)) {
+          if (transformRequestHook && isFunction(transformRequestHook)) {
             try {
               const ret = transformRequestHook(res, opt);
               resolve(ret);
@@ -167,7 +168,7 @@ export class Axios {
           resolve(res as unknown as Promise<T>);
         })
         .catch((e: Error | AxiosError) => {
-          if (requestCatchHook && _.isFunction(requestCatchHook)) {
+          if (requestCatchHook && isFunction(requestCatchHook)) {
             reject(requestCatchHook(e, opt));
             return;
           }

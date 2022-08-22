@@ -65,7 +65,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, watch, computed } from 'vue';
+import { nextTick, onMounted, onUnmounted, watch, computed, onDeactivated } from 'vue';
 
 import * as echarts from 'echarts/core';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
@@ -133,14 +133,19 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateContainer);
 });
 
-watch(
+onDeactivated(() => {
+  storeModeWatch();
+  storeBrandThemeWatch();
+});
+
+const storeModeWatch = watch(
   () => store.mode,
   () => {
     renderCharts();
   },
 );
 
-watch(
+const storeBrandThemeWatch = watch(
   () => store.brandTheme,
   () => {
     changeChartsTheme([lineChart, scatterChart]);
@@ -199,14 +204,14 @@ const onMaterialChange = (value: string[]) => {
 
   &.dark {
     &:hover {
-      background: var(--tdvns-gray-color-14);
+      background: var(--td-gray-color-14);
       cursor: pointer;
     }
   }
 
   &.light {
     &:hover {
-      background: var(--tdvns-gray-color-14);
+      background: var(--td-gray-color-14);
       cursor: pointer;
     }
   }
@@ -214,7 +219,7 @@ const onMaterialChange = (value: string[]) => {
   &__number {
     font-size: 36px;
     line-height: 44px;
-    color: var(--tdvns-text-color-primary);
+    color: var(--td-text-color-primary);
   }
 
   &__text {
@@ -223,7 +228,7 @@ const onMaterialChange = (value: string[]) => {
     align-items: center;
     justify-content: space-between;
     font-size: 14px;
-    color: var(--tdvns-text-color-placeholder);
+    color: var(--td-text-color-placeholder);
     text-align: left;
     line-height: 18px;
 

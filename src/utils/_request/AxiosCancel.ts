@@ -1,57 +1,49 @@
 import type { AxiosRequestConfig, Canceler } from 'axios';
 import axios from 'axios';
-import _ from 'lodash';
+import isFunction from 'lodash/isFunction';
 
-/** 存储请求与取消令牌的键值对列表 */
-let pendingRequestMap = new Map<string, Canceler>();
+// 存储请求与取消令牌的键值对列表
+let pendingMap = new Map<string, Canceler>();
 
-/** 生成请求key */
-const generateRequestKey = (config: AxiosRequestConfig) => {
-  // 考虑携带参数
-  // const { method, url, params, data } = config
-  // const key = [method, url, JSON.stringify(params), JSON.stringify(data)].join('&')
-  // 不考虑携带参数
-  const { method, url } = config;
-  const key = [method, url].join('&');
-  return key;
-};
+export const getPendingUrl = (config: AxiosRequestConfig) => [config.method, config.url].join('&');
 
 export class AxiosCanceler {
-  /** 添加请求信息到队列 */
+  // 添加请求到列表
   addPending(config: AxiosRequestConfig) {
     this.removePending(config);
-    const requestKey = generateRequestKey(config);
+    const url = getPendingUrl(config);
     config.cancelToken =
       config.cancelToken ||
       new axios.CancelToken((cancel) => {
-        if (!pendingRequestMap.has(requestKey)) {
+        if (!pendingMap.has(url)) {
           // 如果当前没有相同请求就添加
-          pendingRequestMap.set(requestKey, cancel);
+          pendingMap.set(url, cancel);
         }
       });
   }
 
-  /** 检查是否存在重复请求，若存在则取消已发的请求 */
+  // 清空所有请求
+  removeAllPending() {
+    pendingMap.forEach((cancel) => {
+      if (cancel && isFunction(cancel)) cancel();
+    });
+    pendingMap.clear();
+  }
+
+  // 移除某个请求
   removePending(config: AxiosRequestConfig) {
-    const requestKey = generateRequestKey(config);
-    if (pendingRequestMap.has(requestKey)) {
-      const cancel = pendingRequestMap.get(requestKey);
-      cancel(requestKey);
-      pendingRequestMap.delete(requestKey);
+    const url = getPendingUrl(config);
+
+    if (pendingMap.has(url)) {
+      // If there is a current request identifier in pending,
+      // the current request needs to be cancelled and removed
+      const cancel = pendingMap.get(url);
+      if (cancel) cancel(url);
+      pendingMap.delete(url);
     }
   }
 
-  /** 清空所有请求 */
-  removeAllPending() {
-    pendingRequestMap.forEach((cancel) => {
-      if (cancel && _.isFunction(cancel)) {
-        cancel();
-      }
-    });
-    pendingRequestMap.clear();
-  }
-
   reset() {
-    pendingRequestMap = new Map<string, Canceler>();
+    pendingMap = new Map<string, Canceler>();
   }
 }

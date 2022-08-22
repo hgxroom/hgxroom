@@ -1,5 +1,6 @@
 import { defineComponent, PropType, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import union from 'lodash/union';
 import { prefix } from '@/config/global';
 import pgk from '../../../package.json';
 import MenuContent from './MenuContent';
@@ -7,7 +8,7 @@ import MenuContent from './MenuContent';
 import logo from '@/assets/logo.png';
 import logoText from '@/assets/logo-text.png';
 import { useSettingStore } from '@/store';
-import { getActive } from '@/router';
+import { getActive, getRoutesExpanded } from '@/router';
 
 const MIN_POINT = 992 - 1;
 
@@ -15,6 +16,13 @@ const useComputed = (props) => {
   const collapsed = computed(() => useSettingStore().isSidebarCompact);
 
   const active = computed(() => getActive());
+
+  const defaultExpanded = computed(() => {
+    const path = getActive();
+    const parentPath = path.substring(0, path.lastIndexOf('/'));
+    const expanded = getRoutesExpanded();
+    return union(expanded, parentPath === '' ? [] : [parentPath]);
+  });
 
   const sideNavCls = computed(() => {
     const { isCompact } = props;
@@ -45,6 +53,7 @@ const useComputed = (props) => {
 
   return {
     active,
+    defaultExpanded,
     collapsed,
     sideNavCls,
     menuCls,
@@ -54,6 +63,9 @@ const useComputed = (props) => {
 
 export default defineComponent({
   name: 'SideNav',
+  components: {
+    MenuContent,
+  },
   props: {
     menu: {
       type: Array as PropType<string[]>,
@@ -126,6 +138,7 @@ export default defineComponent({
         <t-menu
           class={this.menuCls}
           theme={this.theme}
+          default-expanded={this.defaultExpanded}
           value={this.active}
           collapsed={this.collapsed}
           v-slots={{
@@ -146,7 +159,7 @@ export default defineComponent({
             ),
           }}
         >
-          <MenuContent navData={this.menu} />
+          <menu-content navData={this.menu} />
         </t-menu>
         <div class={`${prefix}-side-nav-placeholder${this.collapsed ? '-hidden' : ''}`}></div>
       </div>

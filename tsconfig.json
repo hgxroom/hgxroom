@@ -7,13 +7,14 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "lib": ["esnext", "dom"],
     "noEmit": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["vite-plugin-svg-icons/client"]
+    "types": ["vite/client", "vite-plugin-svg-icons/client"]
   },
   "include": [
     "env.d.ts",

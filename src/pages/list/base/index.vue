@@ -24,8 +24,7 @@
         :pagination="pagination"
         :selected-row-keys="selectedRowKeys"
         :loading="dataLoading"
-        :header-affixed-top="true"
-        :header-affix-props="{ offsetTop, container: getContainer }"
+        :header-affixed-top="{ offsetTop, container: getContainer }"
         @page-change="rehandlePageChange"
         @change="rehandleChange"
         @select-change="rehandleSelectChange"
@@ -46,7 +45,7 @@
           <div v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.PAYMENT" class="payment-col">
             付款<trend class="dashboard-item-trend" type="up" />
           </div>
-          <div v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.RECIPT" class="payment-col">
+          <div v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.RECEIPT" class="payment-col">
             收款<trend class="dashboard-item-trend" type="down" />
           </div>
         </template>
@@ -85,6 +84,7 @@ import Trend from '@/components/trend/index.vue';
 import { ResDataType } from '@/types/interface';
 import request from '@/utils/request';
 import { useSettingStore } from '@/store';
+import { prefix } from '@/config/global';
 
 import { COLUMNS } from './constants';
 
@@ -186,7 +186,7 @@ const offsetTop = computed(() => {
 });
 
 const getContainer = () => {
-  return document.querySelector('.tdesign-starter-layout');
+  return document.querySelector(`.${prefix}-layout`);
 };
 </script>
 
@@ -210,7 +210,7 @@ const getContainer = () => {
   .selected-count {
     display: inline-block;
     margin-left: 8px;
-    color: var(--tdvns-text-color-secondary);
+    color: var(--td-text-color-secondary);
   }
 }
 

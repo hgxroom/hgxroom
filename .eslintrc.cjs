@@ -6,6 +6,7 @@ module.exports = {
     'plugin:vue/vue3-essential',
     'eslint:recommended',
     'eslint-config-airbnb-base',
+    '@vue/typescript/recommended',
     'plugin:vue-scoped-css/base',
     '@vue/eslint-config-typescript/recommended',
     '@vue/eslint-config-prettier',
