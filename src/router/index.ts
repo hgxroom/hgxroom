@@ -6,7 +6,7 @@ import baseRouters from './modules/base';
 import componentsRouters from './modules/components';
 import othersRouters from './modules/others';
 import businessRouters from './modules/business';
-
+import manageRouters from './modules/system';
 // 关于单层路由， meta 中设置
 // { single: true } 即可为单层路由，
 // { hidden: true } 即可在侧边栏隐藏该路由
@@ -17,13 +17,14 @@ export const asyncRouterList: Array<RouteRecordRaw> = [
   ...componentsRouters,
   ...othersRouters,
   ...businessRouters,
+  ...manageRouters,
 ];
 
 // 存放固定的路由
 const defaultRouterList: Array<RouteRecordRaw> = [
   {
     path: '/login',
-    name: 'login',
+    name: 'Login',
     component: () => import('@/pages/login/index.vue'),
   },
   {

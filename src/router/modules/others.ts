@@ -17,6 +17,7 @@ export default [
       },
     ],
   },
+  // 调试用弹回登录页
   {
     path: '/loginRedirect',
     name: 'loginRedirect',
