@@ -12,7 +12,7 @@
       :columns="columns"
       @row-click="handleRowClick"
       :pagination="pagination"
-      @change="rehandleChange"
+      @change="handlePageChange"
     >
       <template #index="{ rowIndex }"> {{ rowIndex + 1 }} </template>
       <template #deviceType="{ row }">
@@ -360,7 +360,7 @@ const handleClick = (row) => {
     drawer.value = `新增设备`;
   }
 };
-const rehandleChange = (changeParams) => {
+const handlePageChange = (changeParams) => {
   const { current, pageSize } = changeParams.pagination;
   getList({ page: current, size: pageSize });
 };

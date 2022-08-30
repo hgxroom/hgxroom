@@ -44,14 +44,11 @@ export const useUserStore = defineStore('user', {
       //     roles: ['UserIndex', 'DashboardBase', 'login'],
       //   };
       // };
-
       // const res = await mockRemoteUserInfo(this.token);
-
       // this.userInfo = res;
-
       const res = await getInfo();
       res.data.roles = [
-        'login',
+        'Login',
         '404Page',
         'Process',
         'Workshop',
@@ -61,7 +58,9 @@ export const useUserStore = defineStore('user', {
         'EmbryosStorage',
         'WorkSequence',
         'ProgressBoard',
+        'ManageAccount',
       ];
+      // res.data.roles = ['all'];
       this.userInfo = res.data;
     },
     async logout() {
